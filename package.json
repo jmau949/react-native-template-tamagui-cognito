@@ -1,0 +1,48 @@
+{
+  "name": "acorn-pups-mobile",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "start:clear": "expo start --clear",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build:android": "expo build:android",
+    "build:ios": "expo build:ios",
+    "build:web": "expo build:web",
+    "eject": "expo eject",
+    "lint": "eslint . --ext .ts,.tsx",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "prebuild": "expo prebuild",
+    "clean": "expo install --fix"
+  },
+  "dependencies": {
+    "@tamagui/animations-react-native": "^1.126.14",
+    "@tamagui/button": "^1.126.14",
+    "@tamagui/card": "^1.126.14",
+    "@tamagui/config": "^1.126.14",
+    "@tamagui/core": "^1.126.14",
+    "@tamagui/font-inter": "^1.126.14",
+    "@tamagui/form": "^1.126.14",
+    "@tamagui/input": "^1.126.14",
+    "@tamagui/stacks": "^1.126.14",
+    "@tamagui/text": "^1.126.14",
+    "@tamagui/theme-base": "^1.126.14",
+    "expo": "~53.0.10",
+    "expo-router": "^5.0.7",
+    "expo-status-bar": "~2.2.3",
+    "react": "19.0.0",
+    "react-native": "0.79.3",
+    "react-native-svg": "^15.12.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@tamagui/babel-plugin": "^1.126.14",
+    "@types/react": "~19.0.10",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "typescript": "~5.8.3"
+  },
+  "private": true
+}
