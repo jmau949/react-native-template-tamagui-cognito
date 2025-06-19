@@ -246,7 +246,13 @@ npm run web
 
 ```bash
 # Start development server (with QR code for mobile)
+# expo go doesnt work with native binaries
 npm start
+
+# expo
+eas build --platform ios --profile development
+
+npx expo start --dev-client
 
 # Start with cleared cache
 npm run start:clear
