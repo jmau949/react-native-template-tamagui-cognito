@@ -142,9 +142,13 @@ export const authService = {
       }
 
       const cognitoUser = await getCurrentUser();
-      return this.cognitoUserToUser(cognitoUser);
+      const user = this.cognitoUserToUser(cognitoUser);
+
+      return user;
     } catch (error) {
-      throw this.formatError(error);
+      console.error("Sign in failed:", error);
+      const formattedError = this.formatError(error);
+      throw formattedError;
     }
   },
 

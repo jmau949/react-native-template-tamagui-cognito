@@ -198,8 +198,10 @@ const ErrorFallbackUI = React.memo<ErrorFallbackUIProps>(
             <YStack space="$2" width="100%">
               <Button
                 onPress={() => {
-                  // Could implement navigation to home or contact support
-                  console.log("Navigate to home or contact support");
+                  // TODO: Add proper navigation to home or support
+                  alert(
+                    "Please restart the app or contact support if the issue persists."
+                  );
                 }}
                 backgroundColor="transparent"
                 borderWidth={1}

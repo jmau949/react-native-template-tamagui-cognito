@@ -7,7 +7,6 @@ import { KeyboardAvoidingView, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Button,
-  Card,
   Form,
   H2,
   Input,
@@ -21,29 +20,69 @@ import {
 
 type Props = NativeStackScreenProps<AuthStackParamList, "Login">;
 
+interface FormErrors {
+  email?: string;
+  password?: string;
+}
+
 export const LoginScreen: React.FC<Props> = ({ navigation }) => {
-  const { signIn, isLoading } = useAuth();
+  const { signIn } = useAuth();
   const toast = useToastController();
   const insets = useSafeAreaInsets();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    if (!password.trim()) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSignIn = async () => {
-    if (!email || !password) {
-      toast.show("Error", {
-        message: "Please enter both email and password",
-        type: "error",
-      });
-      return;
-    }
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    setErrors({});
 
     try {
       await signIn(email, password);
+
+      toast.show("Welcome back!", {
+        title: "Welcome back!",
+        message: "You have been signed in successfully",
+        type: "success",
+      });
     } catch (error) {
-      toast.show("Login Failed", {
-        message: error instanceof Error ? error.message : "Please try again",
+      console.error("Login failed:", error);
+      toast.show("Sign In Failed", {
+        title: "Sign In Failed",
+        message:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred. Please try again.",
         type: "error",
       });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const clearFieldError = (field: keyof FormErrors) => {
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
@@ -82,24 +121,6 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
               </Paragraph>
             </YStack>
 
-            {/* Demo Credentials Info */}
-            <Card
-              backgroundColor="$blue1"
-              borderColor="$blue6"
-              borderWidth={1}
-              borderRadius="$3"
-              padding="$3"
-            >
-              <Text
-                fontSize="$3"
-                color="$blue11"
-                textAlign="center"
-                fontWeight="500"
-              >
-                Demo: demo@acornpups.com / password123
-              </Text>
-            </Card>
-
             {/* Form */}
             <Form onSubmit={handleSignIn}>
               <YStack space="$4">
@@ -108,12 +129,21 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
                   <Input
                     placeholder="Enter your email"
                     value={email}
-                    onChangeText={setEmail}
+                    onChangeText={(value: string) => {
+                      setEmail(value);
+                      clearFieldError("email");
+                    }}
                     keyboardType="email-address"
                     autoCapitalize="none"
                     autoCorrect={false}
                     size="$4"
+                    borderColor={errors.email ? "$red8" : "$borderColor"}
                   />
+                  {errors.email && (
+                    <Text fontSize="$3" color="$red10">
+                      {errors.email}
+                    </Text>
+                  )}
                 </YStack>
 
                 <YStack space="$2">
@@ -121,10 +151,19 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
                   <Input
                     placeholder="Enter your password"
                     value={password}
-                    onChangeText={setPassword}
+                    onChangeText={(value: string) => {
+                      setPassword(value);
+                      clearFieldError("password");
+                    }}
                     secureTextEntry
                     size="$4"
+                    borderColor={errors.password ? "$red8" : "$borderColor"}
                   />
+                  {errors.password && (
+                    <Text fontSize="$3" color="$red10">
+                      {errors.password}
+                    </Text>
+                  )}
                 </YStack>
 
                 <XStack justifyContent="flex-end">
@@ -141,16 +180,15 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
               {/* Sign In Button */}
               <YStack marginTop="$4">
-                <Form.Trigger asChild>
-                  <Button
-                    size="$5"
-                    theme="blue"
-                    disabled={isLoading}
-                    opacity={isLoading ? 0.6 : 1}
-                  >
-                    {isLoading ? "Signing In..." : "Sign In"}
-                  </Button>
-                </Form.Trigger>
+                <Button
+                  size="$5"
+                  theme="blue"
+                  disabled={isSubmitting}
+                  opacity={isSubmitting ? 0.6 : 1}
+                  onPress={handleSignIn}
+                >
+                  {isSubmitting ? "Signing In..." : "Sign In"}
+                </Button>
               </YStack>
             </Form>
 

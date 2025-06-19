@@ -1,3 +1,4 @@
+import { useAuth } from "@/providers/AuthProvider";
 import type { AuthStackParamList } from "@/types/auth";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React from "react";
@@ -8,6 +9,7 @@ type Props = NativeStackScreenProps<AuthStackParamList, "Welcome">;
 
 export const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
+  const { clearAuth, isAuthenticated, user } = useAuth();
 
   return (
     <YStack

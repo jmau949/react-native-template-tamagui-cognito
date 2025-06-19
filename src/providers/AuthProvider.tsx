@@ -16,6 +16,7 @@ interface AuthContextType extends AuthState {
   resendConfirmationCode: (email: string) => Promise<void>;
   refreshUser: () => Promise<void>;
   initializeAuth: () => Promise<void>;
+  clearAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

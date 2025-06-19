@@ -149,8 +149,8 @@ export const HomeScreen: React.FC = () => {
               size="$4"
               variant="outlined"
               onPress={() => {
-                // TODO: Add profile navigation
-                console.log("Navigate to profile");
+                // TODO: Navigate to profile screen
+                alert("Profile feature coming soon!");
               }}
             >
               View Profile

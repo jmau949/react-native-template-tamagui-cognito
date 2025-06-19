@@ -1,6 +1,7 @@
 import { useAuth } from "@/providers/AuthProvider";
 import type { AuthStackParamList } from "@/types/auth";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Toast, useToastController } from "@tamagui/toast";
 import React, { useState } from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -34,7 +35,8 @@ interface FormErrors {
 }
 
 export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
-  const { signUp, isLoading } = useAuth();
+  const { signUp } = useAuth();
+  const toast = useToastController();
   const insets = useSafeAreaInsets();
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -43,6 +45,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const updateFormData = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -67,8 +70,8 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
 
     if (!formData.password) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -82,10 +85,28 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
   const handleSignUp = async () => {
     if (!validateForm()) return;
 
+    setIsSubmitting(true);
+    setErrors({});
+
     try {
       await signUp(formData.email, formData.password, formData.name);
+
+      toast.show("Success", {
+        message: "Account created! Please check your email for verification.",
+        type: "success",
+      });
+
+      navigation.navigate("ConfirmSignUp", { email: formData.email });
     } catch (error) {
-      // Error handling is done in AuthProvider
+      toast.show("Sign Up Failed", {
+        message:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred. Please try again.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -170,7 +191,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                 <YStack space="$2">
                   <Label fontWeight="600">Password *</Label>
                   <Input
-                    placeholder="Create a password"
+                    placeholder="Create a password (min 8 characters)"
                     value={formData.password}
                     onChangeText={(value: string) =>
                       updateFormData("password", value)
@@ -214,10 +235,10 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                   <Button
                     size="$5"
                     theme="blue"
-                    disabled={isLoading}
-                    opacity={isLoading ? 0.6 : 1}
+                    disabled={isSubmitting}
+                    opacity={isSubmitting ? 0.6 : 1}
                   >
-                    {isLoading ? "Creating Account..." : "Create Account"}
+                    {isSubmitting ? "Creating Account..." : "Create Account"}
                   </Button>
                 </Form.Trigger>
               </YStack>
@@ -238,6 +259,9 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
           </YStack>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Toast Provider */}
+      <Toast />
     </YStack>
   );
 };

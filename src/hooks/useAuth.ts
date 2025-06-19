@@ -36,6 +36,7 @@ export const useAuth = () => {
         error: null,
       });
     } catch (error) {
+      console.error("Auth initialization failed:", error);
       setAuthState({
         user: null,
         isLoading: false,
@@ -50,7 +51,7 @@ export const useAuth = () => {
    */
   const signIn = useCallback(async (email: string, password: string) => {
     try {
-      setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
+      setAuthState((prev) => ({ ...prev, error: null }));
 
       const user = await authService.signIn({ email, password });
 
@@ -61,9 +62,11 @@ export const useAuth = () => {
         error: null,
       });
     } catch (error) {
+      console.error("useAuth: Sign in failed:", error);
       setAuthState((prev) => ({
         ...prev,
-        isLoading: false,
+        user: null,
+        isAuthenticated: false,
         error: error instanceof Error ? error.message : "Sign in failed",
       }));
       throw error;
@@ -76,19 +79,18 @@ export const useAuth = () => {
   const signUp = useCallback(
     async (email: string, password: string, name?: string) => {
       try {
-        setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
+        setAuthState((prev) => ({ ...prev, error: null }));
 
         await authService.signUp({ email, password, name });
 
         setAuthState((prev) => ({
           ...prev,
-          isLoading: false,
           error: null,
         }));
       } catch (error) {
+        console.error("useAuth: Sign up failed:", error);
         setAuthState((prev) => ({
           ...prev,
-          isLoading: false,
           error: error instanceof Error ? error.message : "Sign up failed",
         }));
         throw error;
@@ -113,6 +115,7 @@ export const useAuth = () => {
         error: null,
       });
     } catch (error) {
+      console.error("useAuth: Sign out failed:", error);
       setAuthState((prev) => ({
         ...prev,
         isLoading: false,
@@ -127,19 +130,18 @@ export const useAuth = () => {
    */
   const confirmSignUp = useCallback(async (email: string, code: string) => {
     try {
-      setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
+      setAuthState((prev) => ({ ...prev, error: null }));
 
       await authService.confirmSignUp(email, code);
 
       setAuthState((prev) => ({
         ...prev,
-        isLoading: false,
         error: null,
       }));
     } catch (error) {
+      console.error("useAuth: Confirm sign up failed:", error);
       setAuthState((prev) => ({
         ...prev,
-        isLoading: false,
         error:
           error instanceof Error ? error.message : "Email confirmation failed",
       }));
@@ -152,19 +154,18 @@ export const useAuth = () => {
    */
   const resendConfirmationCode = useCallback(async (email: string) => {
     try {
-      setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
+      setAuthState((prev) => ({ ...prev, error: null }));
 
       await authService.resendConfirmationCode(email);
 
       setAuthState((prev) => ({
         ...prev,
-        isLoading: false,
         error: null,
       }));
     } catch (error) {
+      console.error("useAuth: Resend confirmation code failed:", error);
       setAuthState((prev) => ({
         ...prev,
-        isLoading: false,
         error:
           error instanceof Error
             ? error.message
@@ -179,19 +180,18 @@ export const useAuth = () => {
    */
   const forgotPassword = useCallback(async (email: string) => {
     try {
-      setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
+      setAuthState((prev) => ({ ...prev, error: null }));
 
       await authService.forgotPassword({ email });
 
       setAuthState((prev) => ({
         ...prev,
-        isLoading: false,
         error: null,
       }));
     } catch (error) {
+      console.error("useAuth: Forgot password failed:", error);
       setAuthState((prev) => ({
         ...prev,
-        isLoading: false,
         error: error instanceof Error ? error.message : "Password reset failed",
       }));
       throw error;
@@ -204,19 +204,18 @@ export const useAuth = () => {
   const confirmResetPassword = useCallback(
     async (email: string, code: string, newPassword: string) => {
       try {
-        setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
+        setAuthState((prev) => ({ ...prev, error: null }));
 
         await authService.confirmForgotPassword({ email, code, newPassword });
 
         setAuthState((prev) => ({
           ...prev,
-          isLoading: false,
           error: null,
         }));
       } catch (error) {
+        console.error("useAuth: Confirm reset password failed:", error);
         setAuthState((prev) => ({
           ...prev,
-          isLoading: false,
           error:
             error instanceof Error
               ? error.message
@@ -246,6 +245,23 @@ export const useAuth = () => {
     }
   }, []);
 
+  /**
+   * Clear auth state - useful for debugging
+   */
+  const clearAuth = useCallback(async () => {
+    try {
+      await authService.signOut();
+      setAuthState({
+        user: null,
+        isLoading: false,
+        isAuthenticated: false,
+        error: null,
+      });
+    } catch (error) {
+      console.error("Error clearing auth:", error);
+    }
+  }, []);
+
   // Initialize auth on mount
   useEffect(() => {
     initializeAuth();
@@ -262,5 +278,6 @@ export const useAuth = () => {
     confirmResetPassword,
     refreshUser,
     initializeAuth,
+    clearAuth,
   };
 };
