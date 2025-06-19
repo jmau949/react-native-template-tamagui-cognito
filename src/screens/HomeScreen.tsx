@@ -1,4 +1,7 @@
 import { useAuth } from "@/providers/AuthProvider";
+import { AppStackParamList } from "@/types/auth";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -12,8 +15,11 @@ import {
   YStack,
 } from "tamagui";
 
+type NavigationProp = NativeStackNavigationProp<AppStackParamList>;
+
 export const HomeScreen: React.FC = () => {
   const { user, signOut } = useAuth();
+  const navigation = useNavigation<NavigationProp>();
   const insets = useSafeAreaInsets();
 
   const handleSignOut = async () => {
