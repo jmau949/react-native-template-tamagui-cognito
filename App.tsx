@@ -1,4 +1,4 @@
-import { RootNavigator } from "@/navigation";
+import { RootNavigator } from "@/navigation/RootNavigator";
 import { AuthProvider } from "@/providers/AuthProvider";
 import tamaguiConfig from "@/tamagui.config";
 import { ToastProvider } from "@tamagui/toast";

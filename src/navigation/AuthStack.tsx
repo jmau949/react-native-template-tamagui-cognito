@@ -1,11 +1,9 @@
-import {
-  ConfirmResetPasswordScreen,
-  ForgotPasswordScreen,
-  LoginScreen,
-  SignUpScreen,
-  WelcomeScreen,
-} from "@/screens/auth";
-import type { AuthStackParamList } from "@/types";
+import { ConfirmResetPasswordScreen } from "@/screens/auth/ConfirmResetPasswordScreen";
+import { ForgotPasswordScreen } from "@/screens/auth/ForgotPasswordScreen";
+import { LoginScreen } from "@/screens/auth/LoginScreen";
+import { SignUpScreen } from "@/screens/auth/SignUpScreen";
+import { WelcomeScreen } from "@/screens/auth/WelcomeScreen";
+import type { AuthStackParamList } from "@/types/auth";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 

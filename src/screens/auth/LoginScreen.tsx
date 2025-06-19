@@ -1,5 +1,5 @@
 import { useAuth } from "@/providers/AuthProvider";
-import type { AuthStackParamList } from "@/types";
+import type { AuthStackParamList } from "@/types/auth";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Toast, useToastController } from "@tamagui/toast";
 import React, { useState } from "react";

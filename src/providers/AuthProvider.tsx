@@ -1,5 +1,5 @@
-import { authService } from "@/services";
-import { AuthState } from "@/types";
+import { authService } from "@/services/auth";
+import { AuthState } from "@/types/auth";
 import React, {
   createContext,
   ReactNode,

@@ -4,7 +4,7 @@ import {
   ResetPasswordData,
   SignUpCredentials,
   User,
-} from "@/types";
+} from "@/types/auth";
 import * as SecureStore from "expo-secure-store";
 
 class AuthService {

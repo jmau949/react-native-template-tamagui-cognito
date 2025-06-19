@@ -1,5 +1,5 @@
-import { HomeScreen } from "@/screens";
-import type { AppStackParamList } from "@/types";
+import { HomeScreen } from "@/screens/HomeScreen";
+import type { AppStackParamList } from "@/types/auth";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 

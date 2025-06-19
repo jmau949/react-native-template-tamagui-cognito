@@ -1,9 +1,4 @@
-// Navigation types
-export type RootStackParamList = {
-  Home: undefined;
-};
-
-// Component types
+// Common component and utility types
 export interface BaseComponentProps {
   children?: React.ReactNode;
   testID?: string;
@@ -22,5 +17,3 @@ export interface ApiResponse<T = any> {
   success: boolean;
   message?: string;
 }
-
-export * from "./auth";
