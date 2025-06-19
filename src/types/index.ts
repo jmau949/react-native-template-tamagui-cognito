@@ -1,32 +1,26 @@
 // Navigation types
 export type RootStackParamList = {
-  Home: undefined
-}
+  Home: undefined;
+};
 
 // Component types
 export interface BaseComponentProps {
-  children?: React.ReactNode
-  testID?: string
+  children?: React.ReactNode;
+  testID?: string;
 }
 
 // Form types
 export interface FormFieldProps {
-  label?: string
-  error?: string
-  required?: boolean
+  label?: string;
+  error?: string;
+  required?: boolean;
 }
 
 // API types
 export interface ApiResponse<T = any> {
-  data: T
-  success: boolean
-  message?: string
+  data: T;
+  success: boolean;
+  message?: string;
 }
 
-// User types
-export interface User {
-  id: string
-  email: string
-  name: string
-  createdAt: string
-} 
+export * from "./auth";

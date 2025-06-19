@@ -1,10 +1,10 @@
-import { config } from '@tamagui/config/v3'
-import { createTamagui } from '@tamagui/core'
-import { createInterFont } from '@tamagui/font-inter'
-import { createMedia } from '@tamagui/react-native-media-driver'
+import { config } from "@tamagui/config/v3";
+import { createInterFont } from "@tamagui/font-inter";
+import { createMedia } from "@tamagui/react-native-media-driver";
+import { createTamagui } from "tamagui";
 
-const headingFont = createInterFont()
-const bodyFont = createInterFont()
+const headingFont = createInterFont();
+const bodyFont = createInterFont();
 
 const tamaguiConfig = createTamagui({
   ...config,
@@ -25,15 +25,15 @@ const tamaguiConfig = createTamagui({
     gtLg: { minWidth: 1280 + 1 },
     short: { maxHeight: 820 },
     tall: { minHeight: 820 },
-    hoverNone: { hover: 'none' },
-    pointerCoarse: { pointer: 'coarse' },
+    hoverNone: { hover: "none" },
+    pointerCoarse: { pointer: "coarse" },
   }),
-})
+});
 
-export default tamaguiConfig
+export default tamaguiConfig;
 
-export type Conf = typeof tamaguiConfig
+export type Conf = typeof tamaguiConfig;
 
-declare module '@tamagui/core' {
+declare module "tamagui" {
   interface TamaguiCustomConfig extends Conf {}
-} 
+}

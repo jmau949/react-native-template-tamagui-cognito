@@ -1,16 +1,21 @@
-import { StatusBar } from "expo-status-bar";
+import { RootNavigator } from "@/navigation";
+import { AuthProvider } from "@/providers/AuthProvider";
+import tamaguiConfig from "@/tamagui.config";
+import { ToastProvider } from "@tamagui/toast";
 import React from "react";
-import { ErrorBoundary } from "./src/components/ErrorBoundary";
-import { AppTamaguiProvider } from "./src/providers/TamaguiProvider";
-import { HomeScreen } from "./src/screens/HomeScreen";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { TamaguiProvider } from "tamagui";
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <AppTamaguiProvider>
-        <HomeScreen />
-        <StatusBar style="auto" />
-      </AppTamaguiProvider>
-    </ErrorBoundary>
+    <TamaguiProvider config={tamaguiConfig}>
+      <SafeAreaProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <RootNavigator />
+          </AuthProvider>
+        </ToastProvider>
+      </SafeAreaProvider>
+    </TamaguiProvider>
   );
 }

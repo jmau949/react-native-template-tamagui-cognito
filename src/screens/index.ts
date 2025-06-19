@@ -1,1 +1,2 @@
-export { HomeScreen } from './HomeScreen'
+export * from "./auth";
+export { HomeScreen } from "./HomeScreen";

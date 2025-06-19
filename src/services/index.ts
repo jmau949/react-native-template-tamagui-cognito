@@ -1,1 +1,3 @@
-// No services currently - ready for development 
+// No services currently - ready for development
+
+export { authService } from "./auth";
