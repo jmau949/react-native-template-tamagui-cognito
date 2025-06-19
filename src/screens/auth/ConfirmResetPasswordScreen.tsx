@@ -2,6 +2,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import type { AuthStackParamList } from "@/types/auth";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useState } from "react";
+import { KeyboardAvoidingView, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Button,
@@ -91,128 +92,138 @@ export const ConfirmResetPasswordScreen: React.FC<Props> = ({
       paddingTop={insets.top}
       paddingBottom={insets.bottom}
     >
-      <ScrollView
-        flex={1}
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: "center",
-          paddingHorizontal: insets.left + 24,
-          paddingRight: insets.right + 24,
-          paddingVertical: 20,
-        }}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        <YStack space="$6" width="100%" maxWidth={400} alignSelf="center">
-          {/* Header */}
-          <YStack alignItems="center" space="$2">
-            <H2 textAlign="center">Set New Password</H2>
-            <Paragraph color="$color10" textAlign="center">
-              Enter the verification code sent to {email} and your new password.
-            </Paragraph>
+        <ScrollView
+          flex={1}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            paddingHorizontal: insets.left + 24,
+            paddingRight: insets.right + 24,
+            paddingVertical: 20,
+            paddingBottom: Platform.OS === "android" ? 60 : 20,
+          }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
+        >
+          <YStack space="$6" width="100%" maxWidth={400} alignSelf="center">
+            {/* Header */}
+            <YStack alignItems="center" space="$2">
+              <H2 textAlign="center">Set New Password</H2>
+              <Paragraph color="$color10" textAlign="center">
+                Enter the verification code sent to {email} and your new
+                password.
+              </Paragraph>
+            </YStack>
+
+            {/* Form */}
+            <Form onSubmit={handleConfirmReset}>
+              <YStack space="$4">
+                <YStack space="$2">
+                  <Label htmlFor="code" fontWeight="600">
+                    Verification Code *
+                  </Label>
+                  <Input
+                    id="code"
+                    placeholder="Enter verification code"
+                    value={formData.code}
+                    onChangeText={(value: string) =>
+                      updateFormData("code", value)
+                    }
+                    keyboardType="numeric"
+                    autoCapitalize="none"
+                    size="$4"
+                    borderColor={errors.code ? "$red8" : "$borderColor"}
+                  />
+                  {errors.code && (
+                    <Text fontSize="$3" color="$red10">
+                      {errors.code}
+                    </Text>
+                  )}
+                </YStack>
+
+                <YStack space="$2">
+                  <Label htmlFor="newPassword" fontWeight="600">
+                    New Password *
+                  </Label>
+                  <Input
+                    id="newPassword"
+                    placeholder="Enter new password"
+                    value={formData.newPassword}
+                    onChangeText={(value: string) =>
+                      updateFormData("newPassword", value)
+                    }
+                    secureTextEntry
+                    size="$4"
+                    borderColor={errors.newPassword ? "$red8" : "$borderColor"}
+                  />
+                  {errors.newPassword && (
+                    <Text fontSize="$3" color="$red10">
+                      {errors.newPassword}
+                    </Text>
+                  )}
+                </YStack>
+
+                <YStack space="$2">
+                  <Label htmlFor="confirmPassword" fontWeight="600">
+                    Confirm New Password *
+                  </Label>
+                  <Input
+                    id="confirmPassword"
+                    placeholder="Confirm new password"
+                    value={formData.confirmPassword}
+                    onChangeText={(value: string) =>
+                      updateFormData("confirmPassword", value)
+                    }
+                    secureTextEntry
+                    size="$4"
+                    borderColor={
+                      errors.confirmPassword ? "$red8" : "$borderColor"
+                    }
+                  />
+                  {errors.confirmPassword && (
+                    <Text fontSize="$3" color="$red10">
+                      {errors.confirmPassword}
+                    </Text>
+                  )}
+                </YStack>
+              </YStack>
+
+              {/* Reset Password Button */}
+              <YStack marginTop="$4">
+                <Form.Trigger asChild>
+                  <Button
+                    size="$5"
+                    theme="blue"
+                    disabled={isLoading}
+                    opacity={isLoading ? 0.6 : 1}
+                  >
+                    {isLoading ? "Resetting..." : "Reset Password"}
+                  </Button>
+                </Form.Trigger>
+              </YStack>
+            </Form>
+
+            {/* Back to Login Link */}
+            <XStack justifyContent="center" alignItems="center" space="$2">
+              <Paragraph>Remember your password?</Paragraph>
+              <Button
+                size="$3"
+                variant="outlined"
+                onPress={() => navigation.navigate("Login")}
+                chromeless
+              >
+                Back to Login
+              </Button>
+            </XStack>
           </YStack>
-
-          {/* Form */}
-          <Form onSubmit={handleConfirmReset}>
-            <YStack space="$4">
-              <YStack space="$2">
-                <Label htmlFor="code" fontWeight="600">
-                  Verification Code *
-                </Label>
-                <Input
-                  id="code"
-                  placeholder="Enter verification code"
-                  value={formData.code}
-                  onChangeText={(value: string) =>
-                    updateFormData("code", value)
-                  }
-                  keyboardType="numeric"
-                  autoCapitalize="none"
-                  size="$4"
-                  borderColor={errors.code ? "$red8" : "$borderColor"}
-                />
-                {errors.code && (
-                  <Text fontSize="$3" color="$red10">
-                    {errors.code}
-                  </Text>
-                )}
-              </YStack>
-
-              <YStack space="$2">
-                <Label htmlFor="newPassword" fontWeight="600">
-                  New Password *
-                </Label>
-                <Input
-                  id="newPassword"
-                  placeholder="Enter new password"
-                  value={formData.newPassword}
-                  onChangeText={(value: string) =>
-                    updateFormData("newPassword", value)
-                  }
-                  secureTextEntry
-                  size="$4"
-                  borderColor={errors.newPassword ? "$red8" : "$borderColor"}
-                />
-                {errors.newPassword && (
-                  <Text fontSize="$3" color="$red10">
-                    {errors.newPassword}
-                  </Text>
-                )}
-              </YStack>
-
-              <YStack space="$2">
-                <Label htmlFor="confirmPassword" fontWeight="600">
-                  Confirm New Password *
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  placeholder="Confirm new password"
-                  value={formData.confirmPassword}
-                  onChangeText={(value: string) =>
-                    updateFormData("confirmPassword", value)
-                  }
-                  secureTextEntry
-                  size="$4"
-                  borderColor={
-                    errors.confirmPassword ? "$red8" : "$borderColor"
-                  }
-                />
-                {errors.confirmPassword && (
-                  <Text fontSize="$3" color="$red10">
-                    {errors.confirmPassword}
-                  </Text>
-                )}
-              </YStack>
-            </YStack>
-
-            {/* Reset Password Button */}
-            <YStack marginTop="$4">
-              <Form.Trigger asChild>
-                <Button
-                  size="$5"
-                  theme="blue"
-                  disabled={isLoading}
-                  opacity={isLoading ? 0.6 : 1}
-                >
-                  {isLoading ? "Resetting..." : "Reset Password"}
-                </Button>
-              </Form.Trigger>
-            </YStack>
-          </Form>
-
-          {/* Back to Login Link */}
-          <XStack justifyContent="center" alignItems="center" space="$2">
-            <Paragraph>Remember your password?</Paragraph>
-            <Button
-              size="$3"
-              variant="outlined"
-              onPress={() => navigation.navigate("Login")}
-              chromeless
-            >
-              Back to Login
-            </Button>
-          </XStack>
-        </YStack>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </YStack>
   );
 };

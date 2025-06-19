@@ -3,6 +3,7 @@ import type { AuthStackParamList } from "@/types/auth";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Toast, useToastController } from "@tamagui/toast";
 import React, { useState } from "react";
+import { KeyboardAvoidingView, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Button,
@@ -53,118 +54,127 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
       paddingTop={insets.top}
       paddingBottom={insets.bottom}
     >
-      <ScrollView
-        flex={1}
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: "center",
-          paddingHorizontal: insets.left + 24,
-          paddingRight: insets.right + 24,
-          paddingVertical: 20,
-        }}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        <YStack space="$6" width="100%" maxWidth={400} alignSelf="center">
-          {/* Header */}
-          <YStack alignItems="center" space="$2">
-            <H2 textAlign="center">Welcome Back</H2>
-            <Paragraph color="$color10" textAlign="center">
-              Sign in to your account
-            </Paragraph>
+        <ScrollView
+          flex={1}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            paddingHorizontal: insets.left + 24,
+            paddingRight: insets.right + 24,
+            paddingVertical: 20,
+            paddingBottom: Platform.OS === "android" ? 60 : 20,
+          }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
+        >
+          <YStack space="$6" width="100%" maxWidth={400} alignSelf="center">
+            {/* Header */}
+            <YStack alignItems="center" space="$2">
+              <H2 textAlign="center">Welcome Back</H2>
+              <Paragraph color="$color10" textAlign="center">
+                Sign in to your account
+              </Paragraph>
+            </YStack>
+
+            {/* Demo Credentials Info */}
+            <Card
+              backgroundColor="$blue1"
+              borderColor="$blue6"
+              borderWidth={1}
+              borderRadius="$3"
+              padding="$3"
+            >
+              <Text
+                fontSize="$3"
+                color="$blue11"
+                textAlign="center"
+                fontWeight="500"
+              >
+                Demo: demo@acornpups.com / password123
+              </Text>
+            </Card>
+
+            {/* Form */}
+            <Form onSubmit={handleSignIn}>
+              <YStack space="$4">
+                <YStack space="$2">
+                  <Label htmlFor="email" fontWeight="600">
+                    Email *
+                  </Label>
+                  <Input
+                    id="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    size="$4"
+                  />
+                </YStack>
+
+                <YStack space="$2">
+                  <Label htmlFor="password" fontWeight="600">
+                    Password *
+                  </Label>
+                  <Input
+                    id="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                    size="$4"
+                  />
+                </YStack>
+
+                <XStack justifyContent="flex-end">
+                  <Button
+                    size="$3"
+                    variant="outlined"
+                    onPress={() => navigation.navigate("ForgotPassword")}
+                    chromeless
+                  >
+                    Forgot Password?
+                  </Button>
+                </XStack>
+              </YStack>
+
+              {/* Sign In Button */}
+              <YStack marginTop="$4">
+                <Form.Trigger asChild>
+                  <Button
+                    size="$5"
+                    theme="blue"
+                    disabled={isLoading}
+                    opacity={isLoading ? 0.6 : 1}
+                  >
+                    {isLoading ? "Signing In..." : "Sign In"}
+                  </Button>
+                </Form.Trigger>
+              </YStack>
+            </Form>
+
+            {/* Sign Up Link */}
+            <XStack justifyContent="center" alignItems="center" space="$2">
+              <Paragraph>Don't have an account?</Paragraph>
+              <Button
+                size="$3"
+                variant="outlined"
+                onPress={() => navigation.navigate("SignUp")}
+                chromeless
+              >
+                Sign Up
+              </Button>
+            </XStack>
           </YStack>
-
-          {/* Demo Credentials Info */}
-          <Card
-            backgroundColor="$blue1"
-            borderColor="$blue6"
-            borderWidth={1}
-            borderRadius="$3"
-            padding="$3"
-          >
-            <Text
-              fontSize="$3"
-              color="$blue11"
-              textAlign="center"
-              fontWeight="500"
-            >
-              Demo: demo@acornpups.com / password123
-            </Text>
-          </Card>
-
-          {/* Form */}
-          <Form onSubmit={handleSignIn}>
-            <YStack space="$4">
-              <YStack space="$2">
-                <Label htmlFor="email" fontWeight="600">
-                  Email *
-                </Label>
-                <Input
-                  id="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  size="$4"
-                />
-              </YStack>
-
-              <YStack space="$2">
-                <Label htmlFor="password" fontWeight="600">
-                  Password *
-                </Label>
-                <Input
-                  id="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                  size="$4"
-                />
-              </YStack>
-
-              <XStack justifyContent="flex-end">
-                <Button
-                  size="$3"
-                  variant="outlined"
-                  onPress={() => navigation.navigate("ForgotPassword")}
-                  chromeless
-                >
-                  Forgot Password?
-                </Button>
-              </XStack>
-            </YStack>
-
-            {/* Sign In Button */}
-            <YStack marginTop="$4">
-              <Form.Trigger asChild>
-                <Button
-                  size="$5"
-                  theme="blue"
-                  disabled={isLoading}
-                  opacity={isLoading ? 0.6 : 1}
-                >
-                  {isLoading ? "Signing In..." : "Sign In"}
-                </Button>
-              </Form.Trigger>
-            </YStack>
-          </Form>
-
-          {/* Sign Up Link */}
-          <XStack justifyContent="center" alignItems="center" space="$2">
-            <Paragraph>Don't have an account?</Paragraph>
-            <Button
-              size="$3"
-              variant="outlined"
-              onPress={() => navigation.navigate("SignUp")}
-              chromeless
-            >
-              Sign Up
-            </Button>
-          </XStack>
-        </YStack>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* Toast Provider */}
       <Toast />
