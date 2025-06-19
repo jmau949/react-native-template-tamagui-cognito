@@ -3,7 +3,7 @@ import type { AuthStackParamList } from "@/types/auth";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Toast, useToastController } from "@tamagui/toast";
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Platform } from "react-native";
+import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Button,
@@ -89,116 +89,110 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
       paddingTop={insets.top}
       paddingBottom={insets.bottom}
     >
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      <ScrollView
+        flex={1}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          paddingHorizontal: insets.left + 24,
+          paddingRight: insets.right + 24,
+          paddingVertical: 20,
+          paddingBottom: Platform.OS === "android" ? 60 : 20,
+        }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
       >
-        <ScrollView
-          flex={1}
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: "center",
-            paddingHorizontal: insets.left + 24,
-            paddingRight: insets.right + 24,
-            paddingVertical: 20,
-            paddingBottom: Platform.OS === "android" ? 60 : 20,
-          }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
-        >
-          <YStack space="$6" width="100%" maxWidth={400} alignSelf="center">
-            {/* Header */}
-            <YStack alignItems="center" space="$3">
-              <H2 textAlign="center">Verify Your Email</H2>
-              <Paragraph color="$color10" textAlign="center">
-                We've sent a verification code to:
-              </Paragraph>
-              <Text fontWeight="600" fontSize="$4" color="$blue11">
-                {email}
-              </Text>
-            </YStack>
-
-            {/* Info Card */}
-            <Card
-              backgroundColor="$blue1"
-              borderColor="$blue6"
-              borderWidth={1}
-              borderRadius="$4"
-              padding="$4"
-            >
-              <Paragraph fontSize="$3" color="$blue11" textAlign="center">
-                Please check your email and enter the 6-digit verification code
-                below.
-              </Paragraph>
-            </Card>
-
-            {/* Form */}
-            <Form onSubmit={handleConfirmSignUp}>
-              <YStack space="$4">
-                <YStack space="$2">
-                  <Label fontWeight="600">Verification Code *</Label>
-                  <Input
-                    placeholder="Enter 6-digit code"
-                    value={code}
-                    onChangeText={setCode}
-                    keyboardType="number-pad"
-                    autoComplete="one-time-code"
-                    textAlign="center"
-                    fontSize="$5"
-                    letterSpacing={4}
-                    size="$5"
-                    maxLength={6}
-                  />
-                </YStack>
-
-                {/* Verify Button */}
-                <Form.Trigger asChild>
-                  <Button
-                    size="$5"
-                    theme="blue"
-                    disabled={isSubmitting || code.length !== 6}
-                    opacity={isSubmitting || code.length !== 6 ? 0.6 : 1}
-                  >
-                    {isSubmitting ? "Verifying..." : "Verify Email"}
-                  </Button>
-                </Form.Trigger>
-              </YStack>
-            </Form>
-
-            {/* Resend Code */}
-            <YStack space="$3" alignItems="center">
-              <Paragraph fontSize="$3" color="$color10" textAlign="center">
-                Didn't receive the code?
-              </Paragraph>
-              <Button
-                size="$4"
-                variant="outlined"
-                theme="blue"
-                onPress={handleResendCode}
-                disabled={isResending}
-                opacity={isResending ? 0.6 : 1}
-              >
-                {isResending ? "Sending..." : "Resend Code"}
-              </Button>
-            </YStack>
-
-            {/* Back to Sign Up */}
-            <XStack justifyContent="center" alignItems="center" space="$2">
-              <Paragraph fontSize="$3">Wrong email?</Paragraph>
-              <Button
-                size="$3"
-                variant="outlined"
-                onPress={() => navigation.navigate("SignUp")}
-                chromeless
-              >
-                Back to Sign Up
-              </Button>
-            </XStack>
+        <YStack space="$6" width="100%" maxWidth={400} alignSelf="center">
+          {/* Header */}
+          <YStack alignItems="center" space="$3">
+            <H2 textAlign="center">Verify Your Email</H2>
+            <Paragraph color="$color10" textAlign="center">
+              We've sent a verification code to:
+            </Paragraph>
+            <Text fontWeight="600" fontSize="$4" color="$blue11">
+              {email}
+            </Text>
           </YStack>
-        </ScrollView>
-      </KeyboardAvoidingView>
+
+          {/* Info Card */}
+          <Card
+            backgroundColor="$blue1"
+            borderColor="$blue6"
+            borderWidth={1}
+            borderRadius="$4"
+            padding="$4"
+          >
+            <Paragraph fontSize="$3" color="$blue11" textAlign="center">
+              Please check your email and enter the 6-digit verification code
+              below.
+            </Paragraph>
+          </Card>
+
+          {/* Form */}
+          <Form onSubmit={handleConfirmSignUp}>
+            <YStack space="$4">
+              <YStack space="$2">
+                <Label fontWeight="600">Verification Code *</Label>
+                <Input
+                  placeholder="Enter 6-digit code"
+                  value={code}
+                  onChangeText={setCode}
+                  keyboardType="number-pad"
+                  autoComplete="one-time-code"
+                  textAlign="center"
+                  fontSize="$5"
+                  letterSpacing={4}
+                  size="$5"
+                  maxLength={6}
+                />
+              </YStack>
+
+              {/* Verify Button */}
+              <Form.Trigger asChild>
+                <Button
+                  size="$5"
+                  theme="blue"
+                  disabled={isSubmitting || code.length !== 6}
+                  opacity={isSubmitting || code.length !== 6 ? 0.6 : 1}
+                >
+                  {isSubmitting ? "Verifying..." : "Verify Email"}
+                </Button>
+              </Form.Trigger>
+            </YStack>
+          </Form>
+
+          {/* Resend Code */}
+          <YStack space="$3" alignItems="center">
+            <Paragraph fontSize="$3" color="$color10" textAlign="center">
+              Didn't receive the code?
+            </Paragraph>
+            <Button
+              size="$4"
+              variant="outlined"
+              theme="blue"
+              onPress={handleResendCode}
+              disabled={isResending}
+              opacity={isResending ? 0.6 : 1}
+            >
+              {isResending ? "Sending..." : "Resend Code"}
+            </Button>
+          </YStack>
+
+          {/* Back to Sign Up */}
+          <XStack justifyContent="center" alignItems="center" space="$2">
+            <Paragraph fontSize="$3">Wrong email?</Paragraph>
+            <Button
+              size="$3"
+              variant="outlined"
+              onPress={() => navigation.navigate("SignUp")}
+              chromeless
+            >
+              Back to Sign Up
+            </Button>
+          </XStack>
+        </YStack>
+      </ScrollView>
 
       {/* Toast Provider */}
       <Toast />
