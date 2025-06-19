@@ -22,8 +22,8 @@ import {
 type Props = NativeStackScreenProps<AuthStackParamList, "ConfirmSignUp">;
 
 export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { email } = route.params;
-  const { confirmSignUp, resendConfirmationCode } = useAuth();
+  const { email, password } = route.params;
+  const { confirmSignUp, resendConfirmationCode, signIn } = useAuth();
   const toast = useToastController();
   const insets = useSafeAreaInsets();
   const [code, setCode] = useState("");
@@ -42,14 +42,37 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
     setIsSubmitting(true);
 
     try {
+      // Step 1: Confirm sign up
       await confirmSignUp(email, code.trim());
 
       toast.show("Email Verified!", {
-        message: "Your account has been verified. You can now sign in.",
+        message: "Your account has been verified. Signing you in...",
         type: "success",
       });
 
-      navigation.navigate("Login");
+      // Step 2: Automatically sign in the user
+      try {
+        await signIn(email, password);
+
+        // Success toast for sign in
+        toast.show("Welcome!", {
+          message: "You have been signed in successfully",
+          type: "success",
+        });
+
+        // Navigation will be handled automatically by RootNavigator based on auth state
+      } catch (signInError) {
+        console.error("Auto sign-in failed:", signInError);
+
+        // If auto sign-in fails, show error and navigate to login
+        toast.show("Sign In Failed", {
+          message:
+            "Email verified but auto sign-in failed. Please sign in manually.",
+          type: "error",
+        });
+
+        navigation.navigate("Login");
+      }
     } catch (error) {
       console.error("Email confirmation failed:", error);
       toast.show("Verification Failed", {

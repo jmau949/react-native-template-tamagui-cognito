@@ -96,7 +96,10 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
         type: "success",
       });
 
-      navigation.navigate("ConfirmSignUp", { email: formData.email });
+      navigation.navigate("ConfirmSignUp", {
+        email: formData.email,
+        password: formData.password,
+      });
     } catch (error) {
       toast.show("Sign Up Failed", {
         message:
