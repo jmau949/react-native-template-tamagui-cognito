@@ -128,11 +128,8 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
             <Form onSubmit={handleSignUp}>
               <YStack space="$4">
                 <YStack space="$2">
-                  <Label htmlFor="name" fontWeight="600">
-                    Full Name *
-                  </Label>
+                  <Label fontWeight="600">Full Name *</Label>
                   <Input
-                    id="name"
                     placeholder="Enter your full name"
                     value={formData.name}
                     onChangeText={(value: string) =>
@@ -150,11 +147,8 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                 </YStack>
 
                 <YStack space="$2">
-                  <Label htmlFor="email" fontWeight="600">
-                    Email *
-                  </Label>
+                  <Label fontWeight="600">Email *</Label>
                   <Input
-                    id="email"
                     placeholder="Enter your email"
                     value={formData.email}
                     onChangeText={(value: string) =>
@@ -174,11 +168,8 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                 </YStack>
 
                 <YStack space="$2">
-                  <Label htmlFor="password" fontWeight="600">
-                    Password *
-                  </Label>
+                  <Label fontWeight="600">Password *</Label>
                   <Input
-                    id="password"
                     placeholder="Create a password"
                     value={formData.password}
                     onChangeText={(value: string) =>
@@ -196,11 +187,8 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                 </YStack>
 
                 <YStack space="$2">
-                  <Label htmlFor="confirmPassword" fontWeight="600">
-                    Confirm Password *
-                  </Label>
+                  <Label fontWeight="600">Confirm Password *</Label>
                   <Input
-                    id="confirmPassword"
                     placeholder="Confirm your password"
                     value={formData.confirmPassword}
                     onChangeText={(value: string) =>

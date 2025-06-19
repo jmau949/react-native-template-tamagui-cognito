@@ -104,11 +104,8 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
             <Form onSubmit={handleSignIn}>
               <YStack space="$4">
                 <YStack space="$2">
-                  <Label htmlFor="email" fontWeight="600">
-                    Email *
-                  </Label>
+                  <Label fontWeight="600">Email *</Label>
                   <Input
-                    id="email"
                     placeholder="Enter your email"
                     value={email}
                     onChangeText={setEmail}
@@ -120,11 +117,8 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
                 </YStack>
 
                 <YStack space="$2">
-                  <Label htmlFor="password" fontWeight="600">
-                    Password *
-                  </Label>
+                  <Label fontWeight="600">Password *</Label>
                   <Input
-                    id="password"
                     placeholder="Enter your password"
                     value={password}
                     onChangeText={setPassword}

@@ -125,11 +125,8 @@ export const ConfirmResetPasswordScreen: React.FC<Props> = ({
             <Form onSubmit={handleConfirmReset}>
               <YStack space="$4">
                 <YStack space="$2">
-                  <Label htmlFor="code" fontWeight="600">
-                    Verification Code *
-                  </Label>
+                  <Label fontWeight="600">Verification Code *</Label>
                   <Input
-                    id="code"
                     placeholder="Enter verification code"
                     value={formData.code}
                     onChangeText={(value: string) =>
@@ -148,11 +145,8 @@ export const ConfirmResetPasswordScreen: React.FC<Props> = ({
                 </YStack>
 
                 <YStack space="$2">
-                  <Label htmlFor="newPassword" fontWeight="600">
-                    New Password *
-                  </Label>
+                  <Label fontWeight="600">New Password *</Label>
                   <Input
-                    id="newPassword"
                     placeholder="Enter new password"
                     value={formData.newPassword}
                     onChangeText={(value: string) =>
@@ -170,11 +164,8 @@ export const ConfirmResetPasswordScreen: React.FC<Props> = ({
                 </YStack>
 
                 <YStack space="$2">
-                  <Label htmlFor="confirmPassword" fontWeight="600">
-                    Confirm New Password *
-                  </Label>
+                  <Label fontWeight="600">Confirm New Password *</Label>
                   <Input
-                    id="confirmPassword"
                     placeholder="Confirm new password"
                     value={formData.confirmPassword}
                     onChangeText={(value: string) =>

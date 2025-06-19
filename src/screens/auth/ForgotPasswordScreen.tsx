@@ -88,11 +88,8 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
             <Form onSubmit={handleResetPassword}>
               <YStack space="$4">
                 <YStack space="$2">
-                  <Label htmlFor="email" fontWeight="600">
-                    Email Address *
-                  </Label>
+                  <Label fontWeight="600">Email Address *</Label>
                   <Input
-                    id="email"
                     placeholder="Enter your email address"
                     value={email}
                     onChangeText={setEmail}
