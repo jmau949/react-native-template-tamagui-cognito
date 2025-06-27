@@ -1,6 +1,7 @@
 {
-  "name": "acorn-pups-mobile",
+  "name": "react-native-template-tamagui-cognito",
   "version": "1.0.0",
+  "description": "A React Native template with Expo, Tamagui, and AWS Cognito authentication",
   "main": "index.ts",
   "scripts": {
     "start": "expo start --dev-client",
@@ -49,5 +50,22 @@
     "babel-plugin-module-resolver": "^5.0.2",
     "typescript": "~5.8.3"
   },
-  "private": true
+  "keywords": [
+    "react-native",
+    "expo",
+    "tamagui",
+    "aws-cognito",
+    "template",
+    "authentication",
+    "typescript",
+    "mobile"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/react-native-template-tamagui-cognito"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/react-native-template-tamagui-cognito/issues"
+  },
+  "homepage": "https://github.com/yourusername/react-native-template-tamagui-cognito#readme"
 }

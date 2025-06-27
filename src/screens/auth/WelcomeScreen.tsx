@@ -4,6 +4,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, Card, H1, Paragraph, Text, XStack, YStack } from "tamagui";
+import { APP_COLOR, APP_EMOJI, APP_NAME } from "../../../template.config";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "Welcome">;
 
@@ -32,7 +33,7 @@ export const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
           <YStack
             width={120}
             height={120}
-            backgroundColor="$blue9"
+            backgroundColor={APP_COLOR}
             borderRadius="$6"
             alignItems="center"
             justifyContent="center"
@@ -44,13 +45,13 @@ export const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
             $sm={{ width: 100, height: 100 }}
           >
             <Text fontSize={48} color="white" $sm={{ fontSize: 40 }}>
-              🌰
+              {APP_EMOJI}
             </Text>
           </YStack>
 
           <YStack alignItems="center" space="$2">
             <H1 textAlign="center" $sm={{ fontSize: "$7" }}>
-              Acorn Pups
+              {APP_NAME}
             </H1>
             <Paragraph
               color="$color10"
@@ -58,7 +59,7 @@ export const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
               maxWidth={300}
               $sm={{ maxWidth: 280 }}
             >
-              Welcome to your companion app for nurturing growth and development
+              Welcome to your companion app for growth and development
             </Paragraph>
           </YStack>
         </YStack>

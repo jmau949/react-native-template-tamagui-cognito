@@ -1,6 +1,6 @@
-# Acorn Pups Mobile - Authentication Guide
+# React Native Template - Authentication Guide
 
-Complete authentication documentation for the Acorn Pups Mobile app using AWS Cognito.
+Complete authentication documentation for this React Native template using AWS Cognito.
 
 ## Table of Contents
 
@@ -36,7 +36,8 @@ export const ENV_CONFIG = {
 };
 ```
 
-3. Run the app: `npm start`
+3. Update `template.config.ts` with your app details
+4. Run the app: `npm start`
 
 ---
 
@@ -83,7 +84,7 @@ export const ENV_CONFIG = {
 1. In the user pool settings, go to **App integration**
 2. Create an **App client**:
    - **App type**: Public client
-   - **App client name**: `acorn-pups-mobile`
+   - **App client name**: `your-app-name`
    - **Client secret**: Don't generate (not recommended for mobile apps)
    - **Auth flows**:
      - ✅ ALLOW_USER_SRP_AUTH
@@ -99,7 +100,7 @@ If you need AWS service access:
 
 1. Go to **Federated Identities**
 2. Click **Create new identity pool**
-3. **Identity pool name**: `acorn_pups_identity_pool`
+3. **Identity pool name**: `your_app_identity_pool`
 4. **Unauthenticated identities**: Enable if needed
 5. **Authentication providers**:
    - Choose Cognito
@@ -418,7 +419,7 @@ npm start
 
 ## Conclusion
 
-The Acorn Pups Mobile app uses a **simplified, high-performance authentication system** that:
+This template uses a **simplified, high-performance authentication system** that:
 
 - ✅ **Trusts AWS Amplify** for what it does best
 - ✅ **Provides persistent authentication** for seamless UX

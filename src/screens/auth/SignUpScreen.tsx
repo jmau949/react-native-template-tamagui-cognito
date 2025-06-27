@@ -17,6 +17,7 @@ import {
   XStack,
   YStack,
 } from "tamagui";
+import { APP_NAME } from "../../../template.config";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "SignUp">;
 
@@ -160,7 +161,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
           <YStack alignItems="center" space="$1">
             <H2 textAlign="center">Create Account</H2>
             <Paragraph color="$color10" textAlign="center" fontSize="$3">
-              Join the Acorn Pups community
+              Join the {APP_NAME} community
             </Paragraph>
           </YStack>
 

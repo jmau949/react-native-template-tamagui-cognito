@@ -1,25 +1,14 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { AppStackParamList } from "@/types/auth";
 import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React from "react";
+import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  Button,
-  Card,
-  H1,
-  Paragraph,
-  ScrollView,
-  Text,
-  XStack,
-  YStack,
-} from "tamagui";
-
-type NavigationProp = NativeStackNavigationProp<AppStackParamList>;
+import { Button, Card, H1, H2, Paragraph, Text, XStack, YStack } from "tamagui";
+import { APP_COLOR, APP_EMOJI, APP_NAME } from "../../template.config";
 
 export const HomeScreen: React.FC = () => {
   const { user, signOut } = useAuth();
-  const navigation = useNavigation<NavigationProp>();
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
   const handleSignOut = async () => {
@@ -38,7 +27,7 @@ export const HomeScreen: React.FC = () => {
       paddingBottom={insets.bottom}
     >
       <ScrollView
-        flex={1}
+        style={{ flex: 1 }}
         contentContainerStyle={{
           flexGrow: 1,
           paddingHorizontal: insets.left + 24,
@@ -53,18 +42,18 @@ export const HomeScreen: React.FC = () => {
             <YStack
               width={80}
               height={80}
-              backgroundColor="$blue9"
+              backgroundColor={APP_COLOR}
               borderRadius="$round"
               alignItems="center"
               justifyContent="center"
             >
               <Text fontSize={32} color="white">
-                🌰
+                {APP_EMOJI}
               </Text>
             </YStack>
 
             <YStack alignItems="center" space="$2">
-              <H1 textAlign="center">Welcome to Acorn Pups!</H1>
+              <H1 textAlign="center">Welcome to {APP_NAME}!</H1>
               <Paragraph color="$color10" textAlign="center">
                 You're successfully logged in
               </Paragraph>
@@ -107,59 +96,70 @@ export const HomeScreen: React.FC = () => {
 
           {/* Features */}
           <Card
-            backgroundColor="$blue1"
-            borderColor="$blue5"
+            backgroundColor="$gray1"
+            borderColor="$gray5"
             borderWidth={1}
             borderRadius="$4"
             padding="$4"
           >
             <YStack space="$3">
-              <Text fontSize="$5" fontWeight="600" color="$blue12">
-                What's Next?
-              </Text>
+              <H2 fontSize="$5" fontWeight="600" color="$color12">
+                Template Features
+              </H2>
 
               <YStack space="$2">
                 <XStack alignItems="center" space="$3">
-                  <Text fontSize="$4" color="$blue10">
-                    🚀
+                  <Text fontSize="$4" color="$green10">
+                    ✅
                   </Text>
-                  <Paragraph color="$blue11">Explore app features</Paragraph>
+                  <Paragraph>AWS Cognito Authentication</Paragraph>
                 </XStack>
+
                 <XStack alignItems="center" space="$3">
-                  <Text fontSize="$4" color="$blue10">
-                    ⚙️
+                  <Text fontSize="$4" color="$green10">
+                    ✅
                   </Text>
-                  <Paragraph color="$blue11">Customize your profile</Paragraph>
+                  <Paragraph>Tamagui UI Components</Paragraph>
                 </XStack>
+
                 <XStack alignItems="center" space="$3">
-                  <Text fontSize="$4" color="$blue10">
-                    🔒
+                  <Text fontSize="$4" color="$green10">
+                    ✅
                   </Text>
-                  <Paragraph color="$blue11">
-                    Enable biometric authentication
-                  </Paragraph>
+                  <Paragraph>React Navigation</Paragraph>
+                </XStack>
+
+                <XStack alignItems="center" space="$3">
+                  <Text fontSize="$4" color="$green10">
+                    ✅
+                  </Text>
+                  <Paragraph>Error Handling & Logging</Paragraph>
+                </XStack>
+
+                <XStack alignItems="center" space="$3">
+                  <Text fontSize="$4" color="$green10">
+                    ✅
+                  </Text>
+                  <Paragraph>TypeScript Support</Paragraph>
+                </XStack>
+
+                <XStack alignItems="center" space="$3">
+                  <Text fontSize="$4" color="$green10">
+                    ✅
+                  </Text>
+                  <Paragraph>EAS Build Configuration</Paragraph>
                 </XStack>
               </YStack>
             </YStack>
           </Card>
 
-          {/* Actions */}
-          <YStack space="$3" marginTop="auto">
-            <Button
-              size="$4"
-              variant="outlined"
-              onPress={() => {
-                // TODO: Navigate to profile screen
-                alert("Profile feature coming soon!");
-              }}
-            >
-              View Profile
-            </Button>
+          {/* Spacer */}
+          <YStack flex={1} />
 
-            <Button size="$4" theme="red" onPress={handleSignOut}>
-              Sign Out
-            </Button>
-          </YStack>
+          {/* Sign Out Button */}
+          <Button size="$4" theme="red" onPress={handleSignOut}>
+            Sign Out
+          </Button>
         </YStack>
       </ScrollView>
     </YStack>

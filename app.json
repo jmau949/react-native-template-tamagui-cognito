@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "acorn-pups-mobile",
-    "slug": "acorn-pups-mobile",
+    "name": "my-react-native-app",
+    "slug": "my-react-native-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.jmau949.acornpupsmobile",
+      "bundleIdentifier": "com.yourcompany.yourapp",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -31,7 +31,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "bef28c9d-7112-48a9-8d34-7e679aff365f"
+        "projectId": "your-eas-project-id"
       }
     }
   }
