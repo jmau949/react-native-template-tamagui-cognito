@@ -211,6 +211,8 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                     updateFormData("name", value)
                   }
                   autoCapitalize="words"
+                  autoComplete="name"
+                  textContentType="name"
                   size="$4"
                   borderColor={formState.errors.name ? "$red8" : "$borderColor"}
                   disabled={formState.isSubmitting || formState.isSuccess}
@@ -225,6 +227,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
               <YStack space="$2">
                 <Label fontWeight="600">Email *</Label>
                 <Input
+                  id="email"
                   placeholder="Enter your email"
                   value={formData.email}
                   onChangeText={(value: string) =>
@@ -233,6 +236,8 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
+                  autoComplete="email"
+                  textContentType="emailAddress"
                   size="$4"
                   borderColor={
                     formState.errors.email ? "$red8" : "$borderColor"
@@ -255,6 +260,8 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                     updateFormData("password", value)
                   }
                   secureTextEntry
+                  autoComplete="password-new"
+                  textContentType="newPassword"
                   size="$4"
                   borderColor={
                     formState.errors.password ? "$red8" : "$borderColor"
@@ -277,6 +284,8 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                     updateFormData("confirmPassword", value)
                   }
                   secureTextEntry
+                  autoComplete="password-new"
+                  textContentType="newPassword"
                   size="$4"
                   borderColor={
                     formState.errors.confirmPassword ? "$red8" : "$borderColor"

@@ -91,6 +91,8 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
+                  autoComplete="email"
+                  textContentType="emailAddress"
                   size="$4"
                   borderColor={error ? "$red8" : "$borderColor"}
                 />

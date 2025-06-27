@@ -267,6 +267,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
                       }}
                       keyboardType="number-pad"
                       autoComplete="one-time-code"
+                      textContentType="oneTimeCode"
                       textAlign="center"
                       fontSize="$7"
                       fontWeight="600"

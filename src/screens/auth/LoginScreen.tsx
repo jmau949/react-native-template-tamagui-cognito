@@ -199,6 +199,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
               <YStack space="$2">
                 <Label fontWeight="600">Email *</Label>
                 <Input
+                  id="email"
                   placeholder="Enter your email"
                   value={email}
                   onChangeText={(value: string) => {
@@ -208,6 +209,8 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
+                  autoComplete="email"
+                  textContentType="emailAddress"
                   size="$4"
                   borderColor={
                     formState.errors.email ? "$red8" : "$borderColor"
@@ -224,6 +227,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
               <YStack space="$2">
                 <Label fontWeight="600">Password *</Label>
                 <Input
+                  id="password"
                   placeholder="Enter your password"
                   value={password}
                   onChangeText={(value: string) => {
@@ -231,6 +235,8 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
                     clearFieldError("password");
                   }}
                   secureTextEntry
+                  autoComplete="password"
+                  textContentType="password"
                   size="$4"
                   borderColor={
                     formState.errors.password ? "$red8" : "$borderColor"

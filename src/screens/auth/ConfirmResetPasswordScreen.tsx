@@ -134,6 +134,8 @@ export const ConfirmResetPasswordScreen: React.FC<Props> = ({
                     }
                     keyboardType="numeric"
                     autoCapitalize="none"
+                    autoComplete="one-time-code"
+                    textContentType="oneTimeCode"
                     size="$4"
                     borderColor={errors.code ? "$red8" : "$borderColor"}
                   />
@@ -153,6 +155,8 @@ export const ConfirmResetPasswordScreen: React.FC<Props> = ({
                       updateFormData("newPassword", value)
                     }
                     secureTextEntry
+                    autoComplete="password-new"
+                    textContentType="newPassword"
                     size="$4"
                     borderColor={errors.newPassword ? "$red8" : "$borderColor"}
                   />
@@ -172,6 +176,8 @@ export const ConfirmResetPasswordScreen: React.FC<Props> = ({
                       updateFormData("confirmPassword", value)
                     }
                     secureTextEntry
+                    autoComplete="password-new"
+                    textContentType="newPassword"
                     size="$4"
                     borderColor={
                       errors.confirmPassword ? "$red8" : "$borderColor"
