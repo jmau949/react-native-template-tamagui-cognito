@@ -155,20 +155,22 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
         keyboardShouldPersistTaps="handled"
         automaticallyAdjustKeyboardInsets
       >
-        <YStack space="$6" width="100%" maxWidth={400} alignSelf="center">
+        <YStack space="$3" width="100%" maxWidth={400} alignSelf="center">
           {/* Header */}
-          <YStack alignItems="center" space="$2">
+          <YStack alignItems="center" space="$1">
             <H2 textAlign="center">Create Account</H2>
-            <Paragraph color="$color10" textAlign="center">
+            <Paragraph color="$color10" textAlign="center" fontSize="$3">
               Join the Acorn Pups community
             </Paragraph>
           </YStack>
 
           {/* Form */}
           <Form onSubmit={handleSignUp}>
-            <YStack space="$3">
-              <YStack space="$2">
-                <Label fontWeight="600">Full Name *</Label>
+            <YStack space="$1.5">
+              <YStack>
+                <Label fontWeight="600" fontSize="$3" marginBottom="$1">
+                  Full Name *
+                </Label>
                 <Input
                   placeholder="Enter your full name"
                   value={formData.name}
@@ -183,17 +185,19 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                   disabled={formState.isSubmitting || formState.isSuccess}
                 />
                 {/* Fixed height container for name error to prevent layout shift */}
-                <YStack height={24} justifyContent="flex-start">
+                <YStack height={16} justifyContent="flex-start">
                   {formState.errors.name && (
-                    <Text fontSize="$3" color="$red10">
+                    <Text fontSize="$1" color="$red10" marginTop="$0.5">
                       {formState.errors.name}
                     </Text>
                   )}
                 </YStack>
               </YStack>
 
-              <YStack space="$2">
-                <Label fontWeight="600">Email *</Label>
+              <YStack>
+                <Label fontWeight="600" fontSize="$3" marginBottom="$1">
+                  Email *
+                </Label>
                 <Input
                   id="email"
                   placeholder="Enter your email"
@@ -213,17 +217,19 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                   disabled={formState.isSubmitting || formState.isSuccess}
                 />
                 {/* Fixed height container for email error to prevent layout shift */}
-                <YStack height={24} justifyContent="flex-start">
+                <YStack height={16} justifyContent="flex-start">
                   {formState.errors.email && (
-                    <Text fontSize="$3" color="$red10">
+                    <Text fontSize="$1" color="$red10" marginTop="$0.5">
                       {formState.errors.email}
                     </Text>
                   )}
                 </YStack>
               </YStack>
 
-              <YStack space="$2">
-                <Label fontWeight="600">Password *</Label>
+              <YStack>
+                <Label fontWeight="600" fontSize="$3" marginBottom="$1">
+                  Password *
+                </Label>
                 <Input
                   placeholder="Create a password (min 8 characters)"
                   value={formData.password}
@@ -240,17 +246,19 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                   disabled={formState.isSubmitting || formState.isSuccess}
                 />
                 {/* Fixed height container for password error to prevent layout shift */}
-                <YStack height={24} justifyContent="flex-start">
+                <YStack height={16} justifyContent="flex-start">
                   {formState.errors.password && (
-                    <Text fontSize="$3" color="$red10">
+                    <Text fontSize="$1" color="$red10" marginTop="$0.5">
                       {formState.errors.password}
                     </Text>
                   )}
                 </YStack>
               </YStack>
 
-              <YStack space="$2">
-                <Label fontWeight="600">Confirm Password *</Label>
+              <YStack>
+                <Label fontWeight="600" fontSize="$3" marginBottom="$1">
+                  Confirm Password *
+                </Label>
                 <Input
                   placeholder="Confirm your password"
                   value={formData.confirmPassword}
@@ -267,9 +275,9 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                   disabled={formState.isSubmitting || formState.isSuccess}
                 />
                 {/* Fixed height container for confirm password error to prevent layout shift */}
-                <YStack height={24} justifyContent="flex-start">
+                <YStack height={16} justifyContent="flex-start">
                   {formState.errors.confirmPassword && (
-                    <Text fontSize="$3" color="$red10">
+                    <Text fontSize="$1" color="$red10" marginTop="$0.5">
                       {formState.errors.confirmPassword}
                     </Text>
                   )}
@@ -278,7 +286,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
             </YStack>
 
             {/* Create Account Button */}
-            <YStack marginTop="$4">
+            <YStack marginTop="$2">
               <Button
                 size="$5"
                 theme="blue"
@@ -298,21 +306,26 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
           </Form>
 
           {/* Fixed height message container to prevent layout shift - moved to bottom */}
-          <YStack height={100} justifyContent="center">
+          <YStack height={60} justifyContent="center">
             {/* Success Message */}
             {formState.isSuccess && (
               <Card
                 backgroundColor="$green2"
                 borderColor="$green8"
                 borderWidth={1}
-                borderRadius="$4"
-                padding="$4"
+                borderRadius="$3"
+                padding="$2"
               >
-                <YStack space="$2" alignItems="center">
-                  <Text color="$green11" textAlign="center" fontWeight="600">
+                <YStack alignItems="center">
+                  <Text
+                    color="$green11"
+                    textAlign="center"
+                    fontWeight="600"
+                    fontSize="$2"
+                  >
                     ✅ Account Created Successfully!
                   </Text>
-                  <Text color="$green10" textAlign="center" fontSize="$3">
+                  <Text color="$green10" textAlign="center" fontSize="$1">
                     Please check your email for verification instructions
                   </Text>
                 </YStack>
@@ -325,10 +338,10 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                 backgroundColor="$red2"
                 borderColor="$red8"
                 borderWidth={1}
-                borderRadius="$4"
-                padding="$4"
+                borderRadius="$3"
+                padding="$2"
               >
-                <Text color="$red11" textAlign="center">
+                <Text color="$red11" textAlign="center" fontSize="$2">
                   {formState.errors.general}
                 </Text>
               </Card>
@@ -336,10 +349,10 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
           </YStack>
 
           {/* Sign In Link */}
-          <XStack justifyContent="center" alignItems="center" space="$2">
-            <Paragraph>Already have an account?</Paragraph>
+          <XStack justifyContent="center" alignItems="center" space="$1">
+            <Paragraph fontSize="$3">Already have an account?</Paragraph>
             <Button
-              size="$3"
+              size="$2"
               variant="outlined"
               onPress={() => navigation.navigate("Login")}
               chromeless
