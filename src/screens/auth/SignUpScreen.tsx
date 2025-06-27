@@ -164,44 +164,9 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
             </Paragraph>
           </YStack>
 
-          {/* Success Message */}
-          {formState.isSuccess && (
-            <Card
-              backgroundColor="$green2"
-              borderColor="$green8"
-              borderWidth={1}
-              borderRadius="$4"
-              padding="$4"
-            >
-              <YStack space="$2" alignItems="center">
-                <Text color="$green11" textAlign="center" fontWeight="600">
-                  ✅ Account Created Successfully!
-                </Text>
-                <Text color="$green10" textAlign="center" fontSize="$3">
-                  Please check your email for verification instructions
-                </Text>
-              </YStack>
-            </Card>
-          )}
-
-          {/* General Error Message */}
-          {formState.errors.general && (
-            <Card
-              backgroundColor="$red2"
-              borderColor="$red8"
-              borderWidth={1}
-              borderRadius="$4"
-              padding="$4"
-            >
-              <Text color="$red11" textAlign="center">
-                {formState.errors.general}
-              </Text>
-            </Card>
-          )}
-
           {/* Form */}
           <Form onSubmit={handleSignUp}>
-            <YStack space="$4">
+            <YStack space="$3">
               <YStack space="$2">
                 <Label fontWeight="600">Full Name *</Label>
                 <Input
@@ -217,11 +182,14 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                   borderColor={formState.errors.name ? "$red8" : "$borderColor"}
                   disabled={formState.isSubmitting || formState.isSuccess}
                 />
-                {formState.errors.name && (
-                  <Text fontSize="$3" color="$red10">
-                    {formState.errors.name}
-                  </Text>
-                )}
+                {/* Fixed height container for name error to prevent layout shift */}
+                <YStack height={24} justifyContent="flex-start">
+                  {formState.errors.name && (
+                    <Text fontSize="$3" color="$red10">
+                      {formState.errors.name}
+                    </Text>
+                  )}
+                </YStack>
               </YStack>
 
               <YStack space="$2">
@@ -244,11 +212,14 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                   }
                   disabled={formState.isSubmitting || formState.isSuccess}
                 />
-                {formState.errors.email && (
-                  <Text fontSize="$3" color="$red10">
-                    {formState.errors.email}
-                  </Text>
-                )}
+                {/* Fixed height container for email error to prevent layout shift */}
+                <YStack height={24} justifyContent="flex-start">
+                  {formState.errors.email && (
+                    <Text fontSize="$3" color="$red10">
+                      {formState.errors.email}
+                    </Text>
+                  )}
+                </YStack>
               </YStack>
 
               <YStack space="$2">
@@ -268,11 +239,14 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                   }
                   disabled={formState.isSubmitting || formState.isSuccess}
                 />
-                {formState.errors.password && (
-                  <Text fontSize="$3" color="$red10">
-                    {formState.errors.password}
-                  </Text>
-                )}
+                {/* Fixed height container for password error to prevent layout shift */}
+                <YStack height={24} justifyContent="flex-start">
+                  {formState.errors.password && (
+                    <Text fontSize="$3" color="$red10">
+                      {formState.errors.password}
+                    </Text>
+                  )}
+                </YStack>
               </YStack>
 
               <YStack space="$2">
@@ -292,11 +266,14 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                   }
                   disabled={formState.isSubmitting || formState.isSuccess}
                 />
-                {formState.errors.confirmPassword && (
-                  <Text fontSize="$3" color="$red10">
-                    {formState.errors.confirmPassword}
-                  </Text>
-                )}
+                {/* Fixed height container for confirm password error to prevent layout shift */}
+                <YStack height={24} justifyContent="flex-start">
+                  {formState.errors.confirmPassword && (
+                    <Text fontSize="$3" color="$red10">
+                      {formState.errors.confirmPassword}
+                    </Text>
+                  )}
+                </YStack>
               </YStack>
             </YStack>
 
@@ -319,6 +296,44 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
               </Button>
             </YStack>
           </Form>
+
+          {/* Fixed height message container to prevent layout shift - moved to bottom */}
+          <YStack height={100} justifyContent="center">
+            {/* Success Message */}
+            {formState.isSuccess && (
+              <Card
+                backgroundColor="$green2"
+                borderColor="$green8"
+                borderWidth={1}
+                borderRadius="$4"
+                padding="$4"
+              >
+                <YStack space="$2" alignItems="center">
+                  <Text color="$green11" textAlign="center" fontWeight="600">
+                    ✅ Account Created Successfully!
+                  </Text>
+                  <Text color="$green10" textAlign="center" fontSize="$3">
+                    Please check your email for verification instructions
+                  </Text>
+                </YStack>
+              </Card>
+            )}
+
+            {/* General Error Message */}
+            {formState.errors.general && (
+              <Card
+                backgroundColor="$red2"
+                borderColor="$red8"
+                borderWidth={1}
+                borderRadius="$4"
+                padding="$4"
+              >
+                <Text color="$red11" textAlign="center">
+                  {formState.errors.general}
+                </Text>
+              </Card>
+            )}
+          </YStack>
 
           {/* Sign In Link */}
           <XStack justifyContent="center" alignItems="center" space="$2">

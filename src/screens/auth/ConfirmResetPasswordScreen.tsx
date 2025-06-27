@@ -139,11 +139,14 @@ export const ConfirmResetPasswordScreen: React.FC<Props> = ({
                     size="$4"
                     borderColor={errors.code ? "$red8" : "$borderColor"}
                   />
-                  {errors.code && (
-                    <Text fontSize="$3" color="$red10">
-                      {errors.code}
-                    </Text>
-                  )}
+                  {/* Fixed height container for code error to prevent layout shift */}
+                  <YStack height={24} justifyContent="flex-start">
+                    {errors.code && (
+                      <Text fontSize="$3" color="$red10">
+                        {errors.code}
+                      </Text>
+                    )}
+                  </YStack>
                 </YStack>
 
                 <YStack space="$2">
@@ -160,11 +163,14 @@ export const ConfirmResetPasswordScreen: React.FC<Props> = ({
                     size="$4"
                     borderColor={errors.newPassword ? "$red8" : "$borderColor"}
                   />
-                  {errors.newPassword && (
-                    <Text fontSize="$3" color="$red10">
-                      {errors.newPassword}
-                    </Text>
-                  )}
+                  {/* Fixed height container for new password error to prevent layout shift */}
+                  <YStack height={24} justifyContent="flex-start">
+                    {errors.newPassword && (
+                      <Text fontSize="$3" color="$red10">
+                        {errors.newPassword}
+                      </Text>
+                    )}
+                  </YStack>
                 </YStack>
 
                 <YStack space="$2">
@@ -183,11 +189,14 @@ export const ConfirmResetPasswordScreen: React.FC<Props> = ({
                       errors.confirmPassword ? "$red8" : "$borderColor"
                     }
                   />
-                  {errors.confirmPassword && (
-                    <Text fontSize="$3" color="$red10">
-                      {errors.confirmPassword}
-                    </Text>
-                  )}
+                  {/* Fixed height container for confirm password error to prevent layout shift */}
+                  <YStack height={24} justifyContent="flex-start">
+                    {errors.confirmPassword && (
+                      <Text fontSize="$3" color="$red10">
+                        {errors.confirmPassword}
+                      </Text>
+                    )}
+                  </YStack>
                 </YStack>
               </YStack>
 

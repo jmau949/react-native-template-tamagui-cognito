@@ -225,28 +225,31 @@ export const EmailVerificationScreen: React.FC<Props> = ({
           </YStack>
 
           <YStack flex={1} justifyContent="center" space="$6">
-            {/* Success Message */}
-            {(formState.isSuccess || formState.successMessage) && (
-              <YStack paddingVertical="$3">
-                <Text
-                  color="$green10"
-                  textAlign="center"
-                  fontWeight="500"
-                  fontSize="$4"
-                >
-                  ✓ {formState.successMessage || "Success!"}
-                </Text>
-              </YStack>
-            )}
+            {/* Fixed height message container to prevent layout shift */}
+            <YStack height={60} justifyContent="center">
+              {/* Success Message */}
+              {(formState.isSuccess || formState.successMessage) && (
+                <YStack paddingVertical="$3">
+                  <Text
+                    color="$green10"
+                    textAlign="center"
+                    fontWeight="500"
+                    fontSize="$4"
+                  >
+                    ✓ {formState.successMessage || "Success!"}
+                  </Text>
+                </YStack>
+              )}
 
-            {/* Error Message */}
-            {formState.errors.general && (
-              <YStack paddingVertical="$3">
-                <Text color="$red10" textAlign="center" fontSize="$4">
-                  {formState.errors.general}
-                </Text>
-              </YStack>
-            )}
+              {/* Error Message */}
+              {formState.errors.general && (
+                <YStack paddingVertical="$3">
+                  <Text color="$red10" textAlign="center" fontSize="$4">
+                    {formState.errors.general}
+                  </Text>
+                </YStack>
+              )}
+            </YStack>
 
             {/* Form */}
             <YStack space="$6" paddingBottom="$6">
@@ -284,12 +287,14 @@ export const EmailVerificationScreen: React.FC<Props> = ({
                       disabled={formState.isSubmitting || formState.isSuccess}
                     />
 
-                    {/* Code Error */}
-                    {formState.errors.code && (
-                      <Text fontSize="$3" color="$red10" textAlign="center">
-                        {formState.errors.code}
-                      </Text>
-                    )}
+                    {/* Fixed height container for code error to prevent layout shift */}
+                    <YStack height={24} justifyContent="center">
+                      {formState.errors.code && (
+                        <Text fontSize="$3" color="$red10" textAlign="center">
+                          {formState.errors.code}
+                        </Text>
+                      )}
+                    </YStack>
                   </YStack>
 
                   {/* Verify Button */}

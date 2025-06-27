@@ -163,35 +163,38 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
             </Paragraph>
           </YStack>
 
-          {/* Success Message */}
-          {formState.isSuccess && (
-            <Card
-              backgroundColor="$green2"
-              borderColor="$green8"
-              borderWidth={1}
-              borderRadius="$4"
-              padding="$4"
-            >
-              <Text color="$green11" textAlign="center" fontWeight="600">
-                ✅ Welcome back! Signing you in...
-              </Text>
-            </Card>
-          )}
+          {/* Fixed height message container to prevent layout shift */}
+          <YStack height={80} justifyContent="center">
+            {/* Success Message */}
+            {formState.isSuccess && (
+              <Card
+                backgroundColor="$green2"
+                borderColor="$green8"
+                borderWidth={1}
+                borderRadius="$4"
+                padding="$4"
+              >
+                <Text color="$green11" textAlign="center" fontWeight="600">
+                  ✅ Welcome back! Signing you in...
+                </Text>
+              </Card>
+            )}
 
-          {/* General Error Message */}
-          {formState.errors.general && (
-            <Card
-              backgroundColor="$red2"
-              borderColor="$red8"
-              borderWidth={1}
-              borderRadius="$4"
-              padding="$4"
-            >
-              <Text color="$red11" textAlign="center">
-                {formState.errors.general}
-              </Text>
-            </Card>
-          )}
+            {/* General Error Message */}
+            {formState.errors.general && (
+              <Card
+                backgroundColor="$red2"
+                borderColor="$red8"
+                borderWidth={1}
+                borderRadius="$4"
+                padding="$4"
+              >
+                <Text color="$red11" textAlign="center">
+                  {formState.errors.general}
+                </Text>
+              </Card>
+            )}
+          </YStack>
 
           {/* Form */}
           <Form onSubmit={handleSignIn}>
@@ -217,11 +220,14 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
                   }
                   disabled={formState.isSubmitting || formState.isSuccess}
                 />
-                {formState.errors.email && (
-                  <Text fontSize="$3" color="$red10">
-                    {formState.errors.email}
-                  </Text>
-                )}
+                {/* Fixed height container for email error to prevent layout shift */}
+                <YStack height={24} justifyContent="flex-start">
+                  {formState.errors.email && (
+                    <Text fontSize="$3" color="$red10">
+                      {formState.errors.email}
+                    </Text>
+                  )}
+                </YStack>
               </YStack>
 
               <YStack space="$2">
@@ -243,11 +249,14 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
                   }
                   disabled={formState.isSubmitting || formState.isSuccess}
                 />
-                {formState.errors.password && (
-                  <Text fontSize="$3" color="$red10">
-                    {formState.errors.password}
-                  </Text>
-                )}
+                {/* Fixed height container for password error to prevent layout shift */}
+                <YStack height={24} justifyContent="flex-start">
+                  {formState.errors.password && (
+                    <Text fontSize="$3" color="$red10">
+                      {formState.errors.password}
+                    </Text>
+                  )}
+                </YStack>
               </YStack>
 
               <XStack justifyContent="flex-end">

@@ -96,11 +96,14 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
                   size="$4"
                   borderColor={error ? "$red8" : "$borderColor"}
                 />
-                {error && (
-                  <Text fontSize="$3" color="$red10">
-                    {error}
-                  </Text>
-                )}
+                {/* Fixed height container for error to prevent layout shift */}
+                <YStack height={24} justifyContent="flex-start">
+                  {error && (
+                    <Text fontSize="$3" color="$red10">
+                      {error}
+                    </Text>
+                  )}
+                </YStack>
               </YStack>
             </YStack>
 
