@@ -208,173 +208,175 @@ export const EmailVerificationScreen: React.FC<Props> = ({
         flex={1}
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: "center",
           paddingHorizontal: insets.left + 24,
           paddingRight: insets.right + 24,
           paddingVertical: 20,
+          paddingTop: 60,
           paddingBottom: Platform.OS === "android" ? 60 : 20,
         }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         automaticallyAdjustKeyboardInsets
       >
-        <YStack space="$6" width="100%" maxWidth={400} alignSelf="center">
+        <YStack flex={1} width="100%" maxWidth={400} alignSelf="center">
           {/* Header */}
-          <YStack alignItems="center" space="$3">
+          <YStack alignItems="center" paddingTop="$12" paddingBottom="$6">
             <H2 textAlign="center">{title}</H2>
           </YStack>
 
-          {/* Success Message */}
-          {(formState.isSuccess || formState.successMessage) && (
-            <YStack paddingVertical="$3">
-              <Text
-                color="$green10"
-                textAlign="center"
-                fontWeight="500"
-                fontSize="$4"
-              >
-                ✓ {formState.successMessage || "Success!"}
-              </Text>
-            </YStack>
-          )}
-
-          {/* Error Message */}
-          {formState.errors.general && (
-            <YStack paddingVertical="$3">
-              <Text color="$red10" textAlign="center" fontSize="$4">
-                {formState.errors.general}
-              </Text>
-            </YStack>
-          )}
-
-          {/* Form */}
-          <YStack space="$6">
-            <Form onSubmit={handleVerifyCode}>
-              <YStack space="$6">
-                {/* Code Input */}
-                <YStack space="$4" alignItems="center">
-                  <Input
-                    placeholder="000000"
-                    value={code}
-                    onChangeText={(value: string) => {
-                      // Only allow numbers and limit to 6 digits
-                      const numericValue = value
-                        .replace(/[^0-9]/g, "")
-                        .slice(0, 6);
-                      setCode(numericValue);
-                      clearCodeError();
-                    }}
-                    keyboardType="number-pad"
-                    autoComplete="one-time-code"
-                    textAlign="center"
-                    fontSize="$7"
-                    fontWeight="600"
-                    letterSpacing={8}
-                    size="$6"
-                    maxLength={6}
-                    width={200}
-                    borderWidth={0}
-                    backgroundColor="$gray2"
-                    focusStyle={{
-                      backgroundColor: "$gray3",
-                      borderWidth: 0,
-                    }}
-                    disabled={formState.isSubmitting || formState.isSuccess}
-                  />
-
-                  {/* Code Error */}
-                  {formState.errors.code && (
-                    <Text fontSize="$3" color="$red10" textAlign="center">
-                      {formState.errors.code}
-                    </Text>
-                  )}
-                </YStack>
-
-                {/* Verify Button */}
-                <YStack paddingTop="$2">
-                  <Button
-                    size="$5"
-                    backgroundColor="$blue9"
-                    color="white"
-                    borderRadius="$6"
-                    fontWeight="500"
-                    disabled={
-                      formState.isSubmitting ||
-                      code.length !== 6 ||
-                      formState.isSuccess
-                    }
-                    opacity={
-                      formState.isSubmitting ||
-                      code.length !== 6 ||
-                      formState.isSuccess
-                        ? 0.5
-                        : 1
-                    }
-                    onPress={handleVerifyCode}
-                    pressStyle={{
-                      backgroundColor: "$blue10",
-                      scale: 0.98,
-                    }}
-                  >
-                    {formState.isSubmitting
-                      ? "Verifying..."
-                      : formState.isSuccess
-                      ? "Verified!"
-                      : buttonText}
-                  </Button>
-                </YStack>
+          <YStack flex={1} justifyContent="center" space="$6">
+            {/* Success Message */}
+            {(formState.isSuccess || formState.successMessage) && (
+              <YStack paddingVertical="$3">
+                <Text
+                  color="$green10"
+                  textAlign="center"
+                  fontWeight="500"
+                  fontSize="$4"
+                >
+                  ✓ {formState.successMessage || "Success!"}
+                </Text>
               </YStack>
-            </Form>
-          </YStack>
+            )}
 
-          {/* Resend Code */}
-          <YStack space="$4" alignItems="center" paddingTop="$4">
-            <Paragraph fontSize="$3" color="$gray10" textAlign="center">
-              Didn't receive it?
-            </Paragraph>
-            <Button
-              size="$4"
-              backgroundColor="transparent"
-              color="$blue10"
-              fontWeight="500"
-              onPress={handleResendCode}
-              disabled={
-                formState.isResending ||
-                formState.isSubmitting ||
-                formState.isSuccess
-              }
-              opacity={
-                formState.isResending ||
-                formState.isSubmitting ||
-                formState.isSuccess
-                  ? 0.5
-                  : 1
-              }
-              pressStyle={{
-                backgroundColor: "$gray2",
-                scale: 0.98,
-              }}
-            >
-              {formState.isResending ? "Sending..." : "Send new code"}
-            </Button>
-          </YStack>
+            {/* Error Message */}
+            {formState.errors.general && (
+              <YStack paddingVertical="$3">
+                <Text color="$red10" textAlign="center" fontSize="$4">
+                  {formState.errors.general}
+                </Text>
+              </YStack>
+            )}
 
-          {/* Back Button */}
-          <YStack alignItems="center" paddingTop="$6">
-            <Button
-              size="$3"
-              backgroundColor="transparent"
-              color="$gray10"
-              fontWeight="400"
-              onPress={backAction}
-              disabled={formState.isSubmitting || formState.isSuccess}
-              pressStyle={{
-                backgroundColor: "$gray2",
-                scale: 0.98,
-              }}
-            >
-              {backText}
-            </Button>
+            {/* Form */}
+            <YStack space="$6">
+              <Form onSubmit={handleVerifyCode}>
+                <YStack space="$6">
+                  {/* Code Input */}
+                  <YStack space="$4" alignItems="center">
+                    <Input
+                      placeholder="000000"
+                      value={code}
+                      onChangeText={(value: string) => {
+                        // Only allow numbers and limit to 6 digits
+                        const numericValue = value
+                          .replace(/[^0-9]/g, "")
+                          .slice(0, 6);
+                        setCode(numericValue);
+                        clearCodeError();
+                      }}
+                      keyboardType="number-pad"
+                      autoComplete="one-time-code"
+                      textAlign="center"
+                      fontSize="$7"
+                      fontWeight="600"
+                      letterSpacing={8}
+                      size="$6"
+                      maxLength={6}
+                      width={200}
+                      borderWidth={0}
+                      backgroundColor="$gray2"
+                      focusStyle={{
+                        backgroundColor: "$gray3",
+                        borderWidth: 0,
+                      }}
+                      disabled={formState.isSubmitting || formState.isSuccess}
+                    />
+
+                    {/* Code Error */}
+                    {formState.errors.code && (
+                      <Text fontSize="$3" color="$red10" textAlign="center">
+                        {formState.errors.code}
+                      </Text>
+                    )}
+                  </YStack>
+
+                  {/* Verify Button */}
+                  <YStack paddingTop="$2">
+                    <Button
+                      size="$5"
+                      backgroundColor="$blue9"
+                      color="white"
+                      borderRadius="$6"
+                      fontWeight="500"
+                      disabled={
+                        formState.isSubmitting ||
+                        code.length !== 6 ||
+                        formState.isSuccess
+                      }
+                      opacity={
+                        formState.isSubmitting ||
+                        code.length !== 6 ||
+                        formState.isSuccess
+                          ? 0.5
+                          : 1
+                      }
+                      onPress={handleVerifyCode}
+                      pressStyle={{
+                        backgroundColor: "$blue10",
+                        scale: 0.98,
+                      }}
+                    >
+                      {formState.isSubmitting
+                        ? "Verifying..."
+                        : formState.isSuccess
+                        ? "Verified!"
+                        : buttonText}
+                    </Button>
+                  </YStack>
+                </YStack>
+              </Form>
+            </YStack>
+
+            {/* Resend Code */}
+            <YStack space="$4" alignItems="center" paddingTop="$4">
+              <Paragraph fontSize="$3" color="$gray10" textAlign="center">
+                Didn't receive it?
+              </Paragraph>
+              <Button
+                size="$4"
+                backgroundColor="transparent"
+                color="$blue10"
+                fontWeight="500"
+                onPress={handleResendCode}
+                disabled={
+                  formState.isResending ||
+                  formState.isSubmitting ||
+                  formState.isSuccess
+                }
+                opacity={
+                  formState.isResending ||
+                  formState.isSubmitting ||
+                  formState.isSuccess
+                    ? 0.5
+                    : 1
+                }
+                pressStyle={{
+                  backgroundColor: "$gray2",
+                  scale: 0.98,
+                }}
+              >
+                {formState.isResending ? "Sending..." : "Send new code"}
+              </Button>
+            </YStack>
+
+            {/* Back Button */}
+            <YStack alignItems="center" paddingTop="$6">
+              <Button
+                size="$3"
+                backgroundColor="transparent"
+                color="$gray10"
+                fontWeight="400"
+                onPress={backAction}
+                disabled={formState.isSubmitting || formState.isSuccess}
+                pressStyle={{
+                  backgroundColor: "$gray2",
+                  scale: 0.98,
+                }}
+              >
+                {backText}
+              </Button>
+            </YStack>
           </YStack>
         </YStack>
       </ScrollView>
