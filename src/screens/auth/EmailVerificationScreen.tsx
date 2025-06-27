@@ -220,7 +220,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
       >
         <YStack flex={1} width="100%" maxWidth={400} alignSelf="center">
           {/* Header */}
-          <YStack alignItems="center" paddingTop="$12" paddingBottom="$6">
+          <YStack alignItems="center" paddingTop="$12">
             <H2 textAlign="center">{title}</H2>
           </YStack>
 
@@ -249,9 +249,9 @@ export const EmailVerificationScreen: React.FC<Props> = ({
             )}
 
             {/* Form */}
-            <YStack space="$6">
+            <YStack space="$6" paddingBottom="$6">
               <Form onSubmit={handleVerifyCode}>
-                <YStack space="$6">
+                <YStack space="$6" paddingBottom="$6">
                   {/* Code Input */}
                   <YStack space="$4" alignItems="center">
                     <Input
