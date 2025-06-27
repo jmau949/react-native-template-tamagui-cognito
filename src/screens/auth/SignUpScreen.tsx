@@ -7,100 +7,162 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, H2, Input, Paragraph, Text, XStack, YStack } from "tamagui";
 import { APP_NAME } from "../../../template.config";
 
-// Email validation pattern
+// Enhanced email validation pattern
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Props = NativeStackScreenProps<AuthStackParamList, "SignUp">;
 
-export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState<{
-    name?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-    general?: string;
-  }>({});
-  const [isLoading, setIsLoading] = useState(false);
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 
+interface FormErrors {
+  name?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  general?: string;
+}
+
+interface FormState {
+  isSubmitting: boolean;
+  isSuccess: boolean;
+  errors: FormErrors;
+}
+
+export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
   const { signUp } = useAuth();
   const insets = useSafeAreaInsets();
 
-  const validateForm = () => {
-    const newErrors: typeof errors = {};
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-    if (!name.trim()) {
+  const [formState, setFormState] = useState<FormState>({
+    isSubmitting: false,
+    isSuccess: false,
+    errors: {},
+  });
+
+  const updateFormData = (field: keyof FormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (formState.errors[field]) {
+      setFormState((prev) => ({
+        ...prev,
+        errors: { ...prev.errors, [field]: undefined },
+      }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.name.trim()) {
       newErrors.name = "Name is required";
     }
 
-    if (!email) {
+    if (!formData.email.trim()) {
       newErrors.email = "Email is required";
-    } else if (!emailPattern.test(email)) {
+    } else if (!emailPattern.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
     }
 
-    if (!password) {
+    if (!formData.password) {
       newErrors.password = "Password is required";
-    } else if (password.length < 8) {
+    } else if (formData.password.length < 8) {
       newErrors.password = "Password must be at least 8 characters";
     }
 
-    if (!confirmPassword) {
+    if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password";
-    } else if (password !== confirmPassword) {
+    } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-    setErrors(newErrors);
+    setFormState((prev) => ({ ...prev, errors: newErrors }));
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSignUp = async () => {
     if (!validateForm()) return;
 
-    setIsLoading(true);
-    setErrors({});
+    setFormState({
+      isSubmitting: true,
+      isSuccess: false,
+      errors: {},
+    });
 
     try {
-      await signUp(email, password, name);
+      await signUp(formData.email, formData.password, formData.name);
 
-      // Navigate to email verification screen
-      navigation.navigate("EmailVerification", {
-        email,
-        password,
-        context: "signup" as const,
+      setFormState({
+        isSubmitting: false,
+        isSuccess: true,
+        errors: {},
       });
+
+      // Navigate to email verification screen after showing success state briefly
+      setTimeout(() => {
+        navigation.navigate("EmailVerification", {
+          email: formData.email,
+          password: formData.password,
+          context: "signup" as const,
+        });
+      }, 1500);
     } catch (error: any) {
       console.error("Sign up error:", error);
 
-      // Handle specific Cognito errors
+      // Enhanced error handling with better error messages
       let errorMessage = "Failed to create account. Please try again.";
 
       if (error.name === "UsernameExistsException") {
         errorMessage = "An account with this email already exists.";
-        setErrors({ email: errorMessage });
+        setFormState({
+          isSubmitting: false,
+          isSuccess: false,
+          errors: { email: errorMessage },
+        });
         return;
       }
 
       if (error.name === "InvalidParameterException") {
         if (error.message?.includes("email")) {
           errorMessage = "Please enter a valid email address.";
-          setErrors({ email: errorMessage });
+          setFormState({
+            isSubmitting: false,
+            isSuccess: false,
+            errors: { email: errorMessage },
+          });
           return;
         }
         if (error.message?.includes("password")) {
           errorMessage = "Password does not meet requirements.";
-          setErrors({ password: errorMessage });
+          setFormState({
+            isSubmitting: false,
+            isSuccess: false,
+            errors: { password: errorMessage },
+          });
           return;
         }
       }
 
-      setErrors({ general: errorMessage });
-    } finally {
-      setIsLoading(false);
+      setFormState({
+        isSubmitting: false,
+        isSuccess: false,
+        errors: {
+          general:
+            error instanceof Error
+              ? error.message
+              : "An unexpected error occurred. Please try again.",
+        },
+      });
     }
   };
 
@@ -137,7 +199,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
           {/* Form */}
           <YStack space="$3">
             {/* General Error */}
-            {errors.general && (
+            {formState.errors.general && (
               <YStack
                 backgroundColor="$red2"
                 borderColor="$red7"
@@ -146,7 +208,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                 padding="$3"
               >
                 <Text color="$red11" fontSize="$3" textAlign="center">
-                  {errors.general}
+                  {formState.errors.general}
                 </Text>
               </YStack>
             )}
@@ -155,96 +217,102 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
             <YStack space="$2">
               <Input
                 placeholder="Full name"
-                value={name}
-                onChangeText={(text) => {
-                  setName(text);
-                  if (errors.name) {
-                    setErrors({ ...errors, name: undefined });
-                  }
-                }}
-                borderColor={errors.name ? "$red7" : "$borderColor"}
+                value={formData.name}
+                onChangeText={(text) => updateFormData("name", text)}
+                borderColor={formState.errors.name ? "$red7" : "$borderColor"}
                 autoCapitalize="words"
                 autoComplete="name"
+                textContentType="name"
                 returnKeyType="next"
+                disabled={formState.isSubmitting || formState.isSuccess}
               />
-              {errors.name && (
-                <Text color="$red11" fontSize="$2">
-                  {errors.name}
-                </Text>
-              )}
+              {/* Fixed height container for error to prevent layout shifts */}
+              <YStack height={20} justifyContent="flex-start">
+                {formState.errors.name && (
+                  <Text color="$red11" fontSize="$2">
+                    {formState.errors.name}
+                  </Text>
+                )}
+              </YStack>
             </YStack>
 
             {/* Email Field */}
             <YStack space="$2">
               <Input
                 placeholder="Email address"
-                value={email}
-                onChangeText={(text) => {
-                  setEmail(text.toLowerCase());
-                  if (errors.email) {
-                    setErrors({ ...errors, email: undefined });
-                  }
-                }}
-                borderColor={errors.email ? "$red7" : "$borderColor"}
+                value={formData.email}
+                onChangeText={(text) =>
+                  updateFormData("email", text.toLowerCase())
+                }
+                borderColor={formState.errors.email ? "$red7" : "$borderColor"}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                autoCorrect={false}
                 autoComplete="email"
+                textContentType="emailAddress"
                 returnKeyType="next"
+                disabled={formState.isSubmitting || formState.isSuccess}
               />
-              {errors.email && (
-                <Text color="$red11" fontSize="$2">
-                  {errors.email}
-                </Text>
-              )}
+              {/* Fixed height container for error to prevent layout shifts */}
+              <YStack height={20} justifyContent="flex-start">
+                {formState.errors.email && (
+                  <Text color="$red11" fontSize="$2">
+                    {formState.errors.email}
+                  </Text>
+                )}
+              </YStack>
             </YStack>
 
             {/* Password Field */}
             <YStack space="$2">
               <Input
                 placeholder="Password (8+ characters)"
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  if (errors.password) {
-                    setErrors({ ...errors, password: undefined });
-                  }
-                }}
-                borderColor={errors.password ? "$red7" : "$borderColor"}
+                value={formData.password}
+                onChangeText={(text) => updateFormData("password", text)}
+                borderColor={
+                  formState.errors.password ? "$red7" : "$borderColor"
+                }
                 secureTextEntry
                 autoCapitalize="none"
                 autoComplete="new-password"
+                textContentType="newPassword"
                 returnKeyType="next"
+                disabled={formState.isSubmitting || formState.isSuccess}
               />
-              {errors.password && (
-                <Text color="$red11" fontSize="$2">
-                  {errors.password}
-                </Text>
-              )}
+              {/* Fixed height container for error to prevent layout shifts */}
+              <YStack height={20} justifyContent="flex-start">
+                {formState.errors.password && (
+                  <Text color="$red11" fontSize="$2">
+                    {formState.errors.password}
+                  </Text>
+                )}
+              </YStack>
             </YStack>
 
             {/* Confirm Password Field */}
             <YStack space="$2">
               <Input
                 placeholder="Confirm password"
-                value={confirmPassword}
-                onChangeText={(text) => {
-                  setConfirmPassword(text);
-                  if (errors.confirmPassword) {
-                    setErrors({ ...errors, confirmPassword: undefined });
-                  }
-                }}
-                borderColor={errors.confirmPassword ? "$red7" : "$borderColor"}
+                value={formData.confirmPassword}
+                onChangeText={(text) => updateFormData("confirmPassword", text)}
+                borderColor={
+                  formState.errors.confirmPassword ? "$red7" : "$borderColor"
+                }
                 secureTextEntry
                 autoCapitalize="none"
                 autoComplete="new-password"
                 returnKeyType="done"
                 onSubmitEditing={handleSignUp}
+                disabled={formState.isSubmitting || formState.isSuccess}
               />
-              {errors.confirmPassword && (
-                <Text color="$red11" fontSize="$2">
-                  {errors.confirmPassword}
-                </Text>
-              )}
+              {/* Fixed height container for error to prevent layout shifts */}
+              <YStack height={20} justifyContent="flex-start">
+                {formState.errors.confirmPassword && (
+                  <Text color="$red11" fontSize="$2">
+                    {formState.errors.confirmPassword}
+                  </Text>
+                )}
+              </YStack>
             </YStack>
 
             {/* Submit Button */}
@@ -252,10 +320,14 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
               size="$4"
               theme="blue"
               onPress={handleSignUp}
-              disabled={isLoading}
-              opacity={isLoading ? 0.6 : 1}
+              disabled={formState.isSubmitting || formState.isSuccess}
+              opacity={formState.isSubmitting || formState.isSuccess ? 0.6 : 1}
             >
-              {isLoading ? "Creating Account..." : "Create Account"}
+              {formState.isSubmitting
+                ? "Creating Account..."
+                : formState.isSuccess
+                ? "Account Created!"
+                : "Create Account"}
             </Button>
 
             {/* Login Link */}
@@ -268,6 +340,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                 size="$2"
                 onPress={() => navigation.navigate("Login")}
                 chromeless
+                disabled={formState.isSubmitting || formState.isSuccess}
               >
                 <Text color="$blue10" fontSize="$3">
                   Sign In
