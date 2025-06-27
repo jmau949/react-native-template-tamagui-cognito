@@ -166,9 +166,9 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
 
           {/* Form */}
           <Form onSubmit={handleSignUp}>
-            <YStack space="$1.5">
+            <YStack>
               <YStack>
-                <Label fontWeight="600" fontSize="$3" marginBottom="$1">
+                <Label fontWeight="600" fontSize="$3">
                   Full Name *
                 </Label>
                 <Input
@@ -195,7 +195,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
               </YStack>
 
               <YStack>
-                <Label fontWeight="600" fontSize="$3" marginBottom="$1">
+                <Label fontWeight="600" fontSize="$3">
                   Email *
                 </Label>
                 <Input
@@ -227,7 +227,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
               </YStack>
 
               <YStack>
-                <Label fontWeight="600" fontSize="$3" marginBottom="$1">
+                <Label fontWeight="600" fontSize="$3">
                   Password *
                 </Label>
                 <Input
@@ -256,7 +256,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
               </YStack>
 
               <YStack>
-                <Label fontWeight="600" fontSize="$3" marginBottom="$1">
+                <Label fontWeight="600" fontSize="$3">
                   Confirm Password *
                 </Label>
                 <Input
@@ -266,8 +266,6 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                     updateFormData("confirmPassword", value)
                   }
                   secureTextEntry
-                  autoComplete="password-new"
-                  textContentType="newPassword"
                   size="$4"
                   borderColor={
                     formState.errors.confirmPassword ? "$red8" : "$borderColor"
@@ -286,7 +284,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
             </YStack>
 
             {/* Create Account Button */}
-            <YStack marginTop="$2">
+            <YStack marginTop="$4">
               <Button
                 size="$5"
                 theme="blue"
