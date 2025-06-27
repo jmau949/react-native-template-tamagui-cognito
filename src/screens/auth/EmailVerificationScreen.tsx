@@ -6,15 +6,12 @@ import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Button,
-  Card,
   Form,
   H2,
   Input,
-  Label,
   Paragraph,
   ScrollView,
   Text,
-  XStack,
   YStack,
 } from "tamagui";
 
@@ -48,13 +45,8 @@ export const EmailVerificationScreen: React.FC<Props> = ({
   const subtitle = isSignupFlow
     ? "We sent a verification code to complete your account setup"
     : "Please verify your email address to continue signing in";
-  const autoSentMessage = autoSent
-    ? `We just sent a verification code to ${email}`
-    : undefined;
-  const buttonText = isSignupFlow
-    ? "Verify & Complete Setup"
-    : "Verify & Sign In";
-  const backText = isSignupFlow ? "← Back to Sign Up" : "← Back to Sign In";
+  const buttonText = isSignupFlow ? "Complete Setup" : "Verify & Sign In";
+  const backText = isSignupFlow ? "Back to Sign Up" : "Back to Sign In";
   const backAction = () =>
     navigation.navigate(isSignupFlow ? "SignUp" : "Login");
 
@@ -63,7 +55,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
     isResending: false,
     isSuccess: false,
     errors: {},
-    successMessage: autoSentMessage,
+    successMessage: autoSent ? "Code sent" : undefined,
   });
 
   // Clear the auto-sent message after a few seconds
@@ -74,7 +66,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
           ...prev,
           successMessage: undefined,
         }));
-      }, 4000);
+      }, 3000);
 
       return () => clearTimeout(timer);
     }
@@ -84,7 +76,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
     if (!code.trim()) {
       setFormState((prev) => ({
         ...prev,
-        errors: { code: "Please enter the 6-digit verification code" },
+        errors: { code: "Enter the 6-digit code" },
       }));
       return;
     }
@@ -92,7 +84,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
     if (code.length !== 6) {
       setFormState((prev) => ({
         ...prev,
-        errors: { code: "Verification code must be 6 digits" },
+        errors: { code: "Code must be 6 digits" },
       }));
       return;
     }
@@ -110,7 +102,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
 
       setFormState((prev) => ({
         ...prev,
-        successMessage: "Email verified! Signing you in...",
+        successMessage: "Verified! Signing you in...",
       }));
 
       // Step 2: Automatically sign in the user
@@ -122,9 +114,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
           isResending: false,
           isSuccess: true,
           errors: {},
-          successMessage: isSignupFlow
-            ? "Welcome! Your account is ready"
-            : "Welcome back! You're now signed in",
+          successMessage: isSignupFlow ? "Welcome!" : "Welcome back!",
         });
 
         // Navigation will be handled automatically by RootNavigator based on auth state
@@ -137,7 +127,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
           isResending: false,
           isSuccess: false,
           errors: {
-            general: "Email verified successfully! Please sign in to continue.",
+            general: "Verified! Please sign in to continue.",
           },
         });
 
@@ -156,7 +146,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
           general:
             error instanceof Error
               ? error.message
-              : "Verification failed. Please check your code and try again.",
+              : "Invalid code. Please try again.",
         },
       });
     }
@@ -174,7 +164,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
       setFormState((prev) => ({
         ...prev,
         isResending: false,
-        successMessage: "New verification code sent to your email",
+        successMessage: "New code sent",
       }));
 
       // Clear success message after a few seconds
@@ -183,7 +173,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
           ...prev,
           successMessage: undefined,
         }));
-      }, 4000);
+      }, 3000);
     } catch (error) {
       setFormState((prev) => ({
         ...prev,
@@ -192,7 +182,7 @@ export const EmailVerificationScreen: React.FC<Props> = ({
           general:
             error instanceof Error
               ? error.message
-              : "Failed to resend code. Please try again.",
+              : "Failed to resend. Try again.",
         },
       }));
     }
@@ -232,128 +222,121 @@ export const EmailVerificationScreen: React.FC<Props> = ({
           {/* Header */}
           <YStack alignItems="center" space="$3">
             <H2 textAlign="center">{title}</H2>
-            <YStack alignItems="center" space="$2">
-              <Paragraph color="$color10" textAlign="center">
-                {subtitle}
-              </Paragraph>
-              <Text fontWeight="600" fontSize="$4" color="$blue11">
-                {email}
-              </Text>
-            </YStack>
           </YStack>
 
           {/* Success Message */}
           {(formState.isSuccess || formState.successMessage) && (
-            <Card
-              backgroundColor="$green2"
-              borderColor="$green8"
-              borderWidth={1}
-              borderRadius="$4"
-              padding="$4"
-            >
-              <Text color="$green11" textAlign="center" fontWeight="600">
-                ✅ {formState.successMessage || "Successfully verified!"}
+            <YStack paddingVertical="$3">
+              <Text
+                color="$green10"
+                textAlign="center"
+                fontWeight="500"
+                fontSize="$4"
+              >
+                ✓ {formState.successMessage || "Success!"}
               </Text>
-            </Card>
+            </YStack>
           )}
 
-          {/* General Error Message */}
+          {/* Error Message */}
           {formState.errors.general && (
-            <Card
-              backgroundColor="$red2"
-              borderColor="$red8"
-              borderWidth={1}
-              borderRadius="$4"
-              padding="$4"
-            >
-              <Text color="$red11" textAlign="center">
+            <YStack paddingVertical="$3">
+              <Text color="$red10" textAlign="center" fontSize="$4">
                 {formState.errors.general}
               </Text>
-            </Card>
+            </YStack>
           )}
 
-          {/* Info Card */}
-          <Card
-            backgroundColor="$blue1"
-            borderColor="$blue6"
-            borderWidth={1}
-            borderRadius="$4"
-            padding="$4"
-          >
-            <Paragraph fontSize="$3" color="$blue11" textAlign="center">
-              Check your email and enter the 6-digit verification code below
-            </Paragraph>
-          </Card>
-
           {/* Form */}
-          <Form onSubmit={handleVerifyCode}>
-            <YStack space="$4">
-              <YStack space="$2">
-                <Label fontWeight="600">Verification Code *</Label>
-                <Input
-                  placeholder="Enter 6-digit code"
-                  value={code}
-                  onChangeText={(value: string) => {
-                    // Only allow numbers and limit to 6 digits
-                    const numericValue = value
-                      .replace(/[^0-9]/g, "")
-                      .slice(0, 6);
-                    setCode(numericValue);
-                    clearCodeError();
-                  }}
-                  keyboardType="number-pad"
-                  autoComplete="one-time-code"
-                  textAlign="center"
-                  fontSize="$5"
-                  letterSpacing={4}
-                  size="$5"
-                  maxLength={6}
-                  borderColor={formState.errors.code ? "$red8" : "$borderColor"}
-                  disabled={formState.isSubmitting || formState.isSuccess}
-                />
-                {formState.errors.code && (
-                  <Text fontSize="$3" color="$red10">
-                    {formState.errors.code}
-                  </Text>
-                )}
-              </YStack>
+          <YStack space="$6">
+            <Form onSubmit={handleVerifyCode}>
+              <YStack space="$6">
+                {/* Code Input */}
+                <YStack space="$4" alignItems="center">
+                  <Input
+                    placeholder="000000"
+                    value={code}
+                    onChangeText={(value: string) => {
+                      // Only allow numbers and limit to 6 digits
+                      const numericValue = value
+                        .replace(/[^0-9]/g, "")
+                        .slice(0, 6);
+                      setCode(numericValue);
+                      clearCodeError();
+                    }}
+                    keyboardType="number-pad"
+                    autoComplete="one-time-code"
+                    textAlign="center"
+                    fontSize="$7"
+                    fontWeight="600"
+                    letterSpacing={8}
+                    size="$6"
+                    maxLength={6}
+                    width={200}
+                    borderWidth={0}
+                    backgroundColor="$gray2"
+                    focusStyle={{
+                      backgroundColor: "$gray3",
+                      borderWidth: 0,
+                    }}
+                    disabled={formState.isSubmitting || formState.isSuccess}
+                  />
 
-              {/* Verify Button */}
-              <Button
-                size="$5"
-                theme="blue"
-                disabled={
-                  formState.isSubmitting ||
-                  code.length !== 6 ||
-                  formState.isSuccess
-                }
-                opacity={
-                  formState.isSubmitting ||
-                  code.length !== 6 ||
-                  formState.isSuccess
-                    ? 0.6
-                    : 1
-                }
-                onPress={handleVerifyCode}
-              >
-                {formState.isSubmitting
-                  ? "Verifying..."
-                  : formState.isSuccess
-                  ? "Verified!"
-                  : buttonText}
-              </Button>
-            </YStack>
-          </Form>
+                  {/* Code Error */}
+                  {formState.errors.code && (
+                    <Text fontSize="$3" color="$red10" textAlign="center">
+                      {formState.errors.code}
+                    </Text>
+                  )}
+                </YStack>
+
+                {/* Verify Button */}
+                <YStack paddingTop="$2">
+                  <Button
+                    size="$5"
+                    backgroundColor="$blue9"
+                    color="white"
+                    borderRadius="$6"
+                    fontWeight="500"
+                    disabled={
+                      formState.isSubmitting ||
+                      code.length !== 6 ||
+                      formState.isSuccess
+                    }
+                    opacity={
+                      formState.isSubmitting ||
+                      code.length !== 6 ||
+                      formState.isSuccess
+                        ? 0.5
+                        : 1
+                    }
+                    onPress={handleVerifyCode}
+                    pressStyle={{
+                      backgroundColor: "$blue10",
+                      scale: 0.98,
+                    }}
+                  >
+                    {formState.isSubmitting
+                      ? "Verifying..."
+                      : formState.isSuccess
+                      ? "Verified!"
+                      : buttonText}
+                  </Button>
+                </YStack>
+              </YStack>
+            </Form>
+          </YStack>
 
           {/* Resend Code */}
-          <YStack space="$3" alignItems="center">
-            <Paragraph fontSize="$3" color="$color10" textAlign="center">
-              Didn't receive the code?
+          <YStack space="$4" alignItems="center" paddingTop="$4">
+            <Paragraph fontSize="$3" color="$gray10" textAlign="center">
+              Didn't receive it?
             </Paragraph>
             <Button
               size="$4"
-              variant="outlined"
-              theme="blue"
+              backgroundColor="transparent"
+              color="$blue10"
+              fontWeight="500"
               onPress={handleResendCode}
               disabled={
                 formState.isResending ||
@@ -364,26 +347,35 @@ export const EmailVerificationScreen: React.FC<Props> = ({
                 formState.isResending ||
                 formState.isSubmitting ||
                 formState.isSuccess
-                  ? 0.6
+                  ? 0.5
                   : 1
               }
+              pressStyle={{
+                backgroundColor: "$gray2",
+                scale: 0.98,
+              }}
             >
-              {formState.isResending ? "Sending..." : "Resend Code"}
+              {formState.isResending ? "Sending..." : "Send new code"}
             </Button>
           </YStack>
 
           {/* Back Button */}
-          <XStack justifyContent="center">
+          <YStack alignItems="center" paddingTop="$6">
             <Button
               size="$3"
-              variant="outlined"
+              backgroundColor="transparent"
+              color="$gray10"
+              fontWeight="400"
               onPress={backAction}
-              chromeless
               disabled={formState.isSubmitting || formState.isSuccess}
+              pressStyle={{
+                backgroundColor: "$gray2",
+                scale: 0.98,
+              }}
             >
               {backText}
             </Button>
-          </XStack>
+          </YStack>
         </YStack>
       </ScrollView>
     </YStack>
