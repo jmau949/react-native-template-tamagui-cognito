@@ -226,14 +226,11 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                 returnKeyType="next"
                 disabled={formState.isSubmitting || formState.isSuccess}
               />
-              {/* Fixed height container for error to prevent layout shifts */}
-              <YStack height={20} justifyContent="flex-start">
-                {formState.errors.name && (
-                  <Text color="$red11" fontSize="$2">
-                    {formState.errors.name}
-                  </Text>
-                )}
-              </YStack>
+              {formState.errors.name && (
+                <Text color="$red11" fontSize="$2">
+                  {formState.errors.name}
+                </Text>
+              )}
             </YStack>
 
             {/* Email Field */}
@@ -253,14 +250,11 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                 returnKeyType="next"
                 disabled={formState.isSubmitting || formState.isSuccess}
               />
-              {/* Fixed height container for error to prevent layout shifts */}
-              <YStack height={20} justifyContent="flex-start">
-                {formState.errors.email && (
-                  <Text color="$red11" fontSize="$2">
-                    {formState.errors.email}
-                  </Text>
-                )}
-              </YStack>
+              {formState.errors.email && (
+                <Text color="$red11" fontSize="$2">
+                  {formState.errors.email}
+                </Text>
+              )}
             </YStack>
 
             {/* Password Field */}
@@ -279,14 +273,11 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                 returnKeyType="next"
                 disabled={formState.isSubmitting || formState.isSuccess}
               />
-              {/* Fixed height container for error to prevent layout shifts */}
-              <YStack height={20} justifyContent="flex-start">
-                {formState.errors.password && (
-                  <Text color="$red11" fontSize="$2">
-                    {formState.errors.password}
-                  </Text>
-                )}
-              </YStack>
+              {formState.errors.password && (
+                <Text color="$red11" fontSize="$2">
+                  {formState.errors.password}
+                </Text>
+              )}
             </YStack>
 
             {/* Confirm Password Field */}
@@ -305,14 +296,11 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                 onSubmitEditing={handleSignUp}
                 disabled={formState.isSubmitting || formState.isSuccess}
               />
-              {/* Fixed height container for error to prevent layout shifts */}
-              <YStack height={20} justifyContent="flex-start">
-                {formState.errors.confirmPassword && (
-                  <Text color="$red11" fontSize="$2">
-                    {formState.errors.confirmPassword}
-                  </Text>
-                )}
-              </YStack>
+              {formState.errors.confirmPassword && (
+                <Text color="$red11" fontSize="$2">
+                  {formState.errors.confirmPassword}
+                </Text>
+              )}
             </YStack>
 
             {/* Submit Button */}
