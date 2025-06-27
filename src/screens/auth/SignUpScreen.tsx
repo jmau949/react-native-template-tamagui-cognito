@@ -198,21 +198,6 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
 
           {/* Form */}
           <YStack space="$3">
-            {/* General Error */}
-            {formState.errors.general && (
-              <YStack
-                backgroundColor="$red2"
-                borderColor="$red7"
-                borderWidth={1}
-                borderRadius="$3"
-                padding="$3"
-              >
-                <Text color="$red11" fontSize="$3" textAlign="center">
-                  {formState.errors.general}
-                </Text>
-              </YStack>
-            )}
-
             {/* Name Field */}
             <YStack space="$2">
               <Input
@@ -335,6 +320,23 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
                 </Text>
               </Button>
             </XStack>
+          </YStack>
+
+          {/* Fixed space container for general error to prevent layout shifts */}
+          <YStack height={80} justifyContent="flex-start">
+            {formState.errors.general && (
+              <YStack
+                backgroundColor="$red2"
+                borderColor="$red7"
+                borderWidth={1}
+                borderRadius="$3"
+                padding="$3"
+              >
+                <Text color="$red11" fontSize="$3" textAlign="center">
+                  {formState.errors.general}
+                </Text>
+              </YStack>
+            )}
           </YStack>
         </YStack>
       </ScrollView>
