@@ -134,178 +134,273 @@ src/
 
 ### Prerequisites
 
-1. **Node.js** (v18 or later)
-2. **Expo CLI and EAS CLI**
+1. **Install Node.js** (v18 or later)
+2. **Install Expo CLI and EAS CLI**
    ```powershell
    npm install -g @expo/cli eas-cli
    ```
-3. **Expo account** at [expo.dev](https://expo.dev)
-4. **AWS account** for Cognito setup
-5. **Apple Developer account** ($99/year) for iOS development
-6. **Android device or emulator** for Android development
-
-### Initial Setup
-
-1. **Clone and install dependencies**
-
+3. **Create Expo account** at [expo.dev](https://expo.dev) if you don't have one
+4. **Clone and setup project**
    ```powershell
-   git clone <your-repo-url>
-   cd your-project-name
+   git clone <repository-url>
+   cd acorn-pups-mobile
    npm install
    ```
 
-2. **Configure your app** by updating `template.config.ts`
+### Initial EAS Setup
 
-3. **Setup AWS Cognito** following the [Authentication Guide](./docs/AUTHENTICATION_GUIDE.md)
+1. **Login to Expo** - Authenticates your CLI with your Expo account
 
-4. **Login to Expo and configure EAS**
    ```powershell
    eas login
+   ```
+
+2. **Configure EAS builds** - Creates `eas.json` configuration file for build profiles (development, production, etc.)
+   ```powershell
    eas build:configure
    ```
 
-## 📱 Building & Deployment
+## 📱 iOS Development Setup
 
-### Development Builds
+### Step 1: Apple Developer Account Setup
 
-For iOS:
+1. **Apple Developer Account** - You need a paid Apple Developer account ($99/year)
+2. **Add your Apple ID** to EAS - Links your Apple Developer account for device registration and certificate management:
+   ```powershell
+   eas device:create
+   ```
+
+### Step 2: Register Your iOS Device
+
+1. **Find your device UDID**:
+
+   - Connect your iPhone to a Mac and open Finder, or
+   - Use a UDID finder website, or
+   - Use this command to generate a registration URL:
+
+   ```powershell
+   eas device:create
+   ```
+
+   - Open the generated URL on your iOS device and follow instructions
+     This automatically registers your device's UDID with your Apple Developer account
+
+2. **Verify device registration** - Lists all registered devices to confirm your device was added:
+   ```powershell
+   eas device:list
+   ```
+   Your device should appear in this list.
+
+### Step 3: Build and Install Development Build
+
+1. **Create iOS development build** - Builds the app with development profile (includes debugging tools):
+   ```powershell
+   eas build --platform ios --profile development
+   ```
+2. **Wait for build to complete** (usually 10-20 minutes)
+
+3. **Install on device**:
+   - Open the build URL on your iPhone
+   - Follow the installation prompts
+   - Trust the developer certificate in Settings > General > VPN & Device Management
+
+### Step 4: Start Development
+
+1. **Start the development server**:
+
+   ```powershell
+   npm start
+   ```
+
+2. **Open the development build** on your iPhone and scan the QR code or enter the URL manually
+
+## 🤖 Android Development Setup
+
+### Option 1: Physical Android Device (Recommended)
+
+#### Step 1: Prepare Your Android Device
+
+1. **Enable Developer Options**:
+
+   - Go to Settings > About phone
+   - Tap "Build number" 7 times
+   - Developer options will appear in Settings
+
+2. **Enable USB Debugging**:
+
+   - Go to Settings > Developer options
+   - Enable "USB debugging"
+
+3. **Connect device to PC**:
+   - Use USB cable
+   - Allow USB debugging when prompted
+
+#### Step 2: Build and Install
+
+1. **Create Android development build** - Builds the APK with development profile (includes debugging tools):
+
+   ```powershell
+   eas build --platform android --profile development
+   ```
+
+2. **Install the APK**:
+   - Download the APK from the build URL
+   - Install on your device (may need to allow installing from unknown sources)
+
+#### Step 3: Start Development
+
+1. **Start the development server**:
+
+   ```powershell
+   npm start
+   ```
+
+2. **Open the development build** on your Android device and scan the QR code
+
+### Option 2: Android Emulator
+
+#### Step 1: Install Android Studio
+
+1. **Download Android Studio** from [developer.android.com](https://developer.android.com/studio)
+2. **Install Android SDK** and create a virtual device
+3. **Add Android SDK to PATH** (usually in `%LOCALAPPDATA%\Android\Sdk`)
+
+#### Step 2: Create and Start Emulator
+
+1. **Open Android Studio** > AVD Manager
+2. **Create a new virtual device** (recommended: Pixel 6 with API 33+)
+3. **Start the emulator**
+
+#### Step 3: Build and Install
+
+1. **Create Android development build** - Builds the APK with development profile (includes debugging tools):
+
+   ```powershell
+   eas build --platform android --profile development
+   ```
+
+2. **Install on emulator** - Uses Android Debug Bridge to install the APK on running emulator:
+   ```powershell
+   adb install path/to/downloaded-build.apk
+   ```
+
+## 🔧 Development Commands
 
 ```powershell
+# Start development server - Starts Metro bundler for hot reloading
+npm start
+
+# Start with cleared cache - Clears Metro cache and starts fresh
+npm run start:clear
+
+# Create development builds - Builds with debugging tools enabled
 eas build --platform ios --profile development
-```
-
-For Android:
-
-```powershell
 eas build --platform android --profile development
-```
 
-### Production Builds
-
-For iOS:
-
-```powershell
+# Create production builds - Builds optimized for app store submission
 eas build --platform ios --profile production
-```
-
-For Android:
-
-```powershell
 eas build --platform android --profile production
+
+# Check build status - Lists all your builds and their current status
+eas build:list
+
+# Type checking - Runs TypeScript compiler to check for type errors
+npm run type-check
+
+# Clean and reinstall dependencies - Removes node_modules and reinstalls
+npm run clean
 ```
 
-### App Store Deployment
+## 🚀 Production Builds
 
-```powershell
-eas submit --platform ios
-eas submit --platform android
-```
+### iOS Production
 
-## 🎨 Customization
+1. **Ensure App Store Connect setup**:
 
-### Theming
+   - App Store Connect account
+   - App identifier registered
+   - Certificates and profiles configured
 
-The template uses Tamagui for theming. Customize your app's appearance in:
+2. **Create production build** - Builds optimized version for App Store submission:
 
-- `src/constants/theme.ts` - Theme configuration
-- `src/tamagui.config.ts` - Tamagui setup
-- `template.config.ts` - App colors and branding
+   ```powershell
+   eas build --platform ios --profile production
+   ```
 
-### Adding New Screens
+3. **Submit to App Store** - Automatically uploads your build to App Store Connect:
+   ```powershell
+   eas submit --platform ios
+   ```
 
-1. Create your screen component in `src/screens/`
-2. Add route types to `src/types/navigation.ts`
-3. Update navigation stacks in `src/navigation/`
+### Android Production
 
-### Adding New Features
+1. **Create production build** - Builds signed APK/AAB for Google Play Store:
 
-The template provides a solid foundation. Common additions:
+   ```powershell
+   eas build --platform android --profile production
+   ```
 
-- **Database integration** (Supabase, Firebase, etc.)
-- **Push notifications** (Expo Notifications)
-- **Analytics** (Expo Analytics, Firebase Analytics)
-- **Crash reporting** (Sentry)
-- **State management** (Zustand, Redux Toolkit)
+2. **Submit to Google Play** - Automatically uploads your build to Google Play Console:
+   ```powershell
+   eas submit --platform android
+   ```
 
-## 🔧 Available Scripts
+## 🆘 Troubleshooting
 
-```powershell
-# Development
-npm start              # Start development server
-npm run start:clear    # Start with cleared cache
-npm run android        # Start with Android focus
-npm run ios           # Start with iOS focus
+### iOS Issues
 
-# Building
-npm run build:android  # Build for Android
-npm run build:ios     # Build for iOS
-npm run prebuild      # Generate native code
+1. **Device not registered** - Register your device and verify it's added:
 
-# Code Quality
-npm run lint          # Run ESLint
-npm run type-check    # Run TypeScript checks
-npm test             # Run tests (when added)
+   ```powershell
+   eas device:create  # Creates device registration URL
+   eas device:list    # Lists all registered devices
+   ```
 
-# Maintenance
-npm run clean         # Clean dependencies
-```
+2. **Certificate issues**:
 
-## 📚 Documentation
+   - Check Apple Developer account status
+   - Verify device is registered
+   - Try `eas build --clear-cache` - Clears build cache and regenerates certificates
 
-- [Authentication Guide](./docs/AUTHENTICATION_GUIDE.md) - Complete AWS Cognito setup
-- [Tamagui Documentation](https://tamagui.dev/) - UI framework
-- [Expo Documentation](https://docs.expo.dev/) - Platform and tools
-- [React Navigation](https://reactnavigation.org/) - Navigation library
+3. **Installation failed**:
+   - Trust developer certificate in iOS Settings
+   - Check device storage space
+   - Verify device UDID is correct
 
-## 🤝 Contributing
+### Android Issues
 
-This template is designed to be a starting point. If you make improvements that would benefit others:
+1. **APK won't install**:
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your improvements
-4. Submit a pull request
+   - Enable "Install unknown apps" for your browser
+   - Check Android version compatibility
+   - Clear space on device
 
-## 📄 License
+2. **USB debugging not working**:
 
-This template is open source and available under the [MIT License](LICENSE).
+   - Try different USB cable
+   - Restart adb: `adb kill-server && adb start-server`
+   - Check Windows drivers for your device
 
-## 🆘 Support
+3. **Emulator issues**:
+   - Ensure hardware acceleration is enabled
+   - Increase emulator RAM in AVD settings
+   - Try different API level
 
-### Template Issues
+### General Issues
 
-- Check the [troubleshooting section](./docs/AUTHENTICATION_GUIDE.md#troubleshooting)
-- Search [existing issues](https://github.com/yourusername/react-native-template-tamagui-cognito/issues)
-- Create a [new issue](https://github.com/yourusername/react-native-template-tamagui-cognito/issues/new)
+1. **Build failures** - Clear build cache and try again:
 
-### Common Problems
+   ```powershell
+   eas build --clear-cache --platform [ios|android] --profile development
+   ```
 
-1. **Build failures**: Try `eas build --clear-cache`
-2. **Metro bundler issues**: Run `npm run start:clear`
-3. **Dependency conflicts**: Run `npm run clean`
+2. **Metro bundler issues** - Clear Metro cache and restart:
 
-## 🎯 Roadmap
+   ```powershell
+   npm run start:clear
+   ```
 
-Future improvements planned:
-
-- [ ] Additional authentication providers (Google, Apple)
-- [ ] More UI components and screens
-- [ ] Testing setup with Jest/Detox
-- [ ] CI/CD pipeline examples
-- [ ] More customization options
-
-## ⭐ Acknowledgments
-
-Built with amazing open source projects:
-
-- [Expo](https://expo.dev/) - Development platform
-- [Tamagui](https://tamagui.dev/) - UI system
-- [React Navigation](https://reactnavigation.org/) - Navigation
-- [AWS Amplify](https://aws.amazon.com/amplify/) - Authentication
-- [TypeScript](https://www.typescriptlang.org/) - Type safety
-
----
-
-**Happy coding! 🚀**
-
-If this template helps you build something amazing, consider giving it a ⭐ on GitHub!
+3. **Dependency issues** - Clean install all dependencies:
+   ```powershell
+   npm run clean
+   ```
