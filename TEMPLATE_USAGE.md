@@ -8,22 +8,22 @@ This guide will help you set up this React Native template for your specific pro
 
 Click **"Use this template"** button on GitHub to create a new repository, or clone this repository:
 
-```powershell
+```bash
 git clone https://github.com/yourusername/react-native-template-tamagui-cognito.git your-project-name
 cd your-project-name
 ```
 
-### 2. Run Setup Script (PowerShell)
+### 2. Run Setup Script
 
-For Windows users, you can use the automated setup script:
+You can use the automated setup script:
 
-```powershell
-.\setup-template.ps1 -AppName "Your Amazing App" -AppSlug "your-amazing-app" -IOSBundleId "com.yourcompany.yourapp" -AndroidPackage "com.yourcompany.yourapp"
+```bash
+./setup-template.sh --app-name "Your Amazing App" --app-slug "your-amazing-app" --ios-bundle-id "com.yourcompany.yourapp" --android-package "com.yourcompany.yourapp"
 ```
 
-### 3. Manual Setup (All Platforms)
+### 3. Manual Setup (Alternative)
 
-If you prefer manual setup or are not on Windows:
+If you prefer manual setup:
 
 #### Update `template.config.ts`
 
@@ -43,15 +43,11 @@ export const TEMPLATE_CONFIG = {
   IOS_BUNDLE_ID: "com.yourcompany.yourapp",
   ANDROID_PACKAGE: "com.yourcompany.yourapp",
 
-  // Company/Developer Info
+  // Company Info
   COMPANY_NAME: "Your Company Name",
-  DEVELOPER_NAME: "Your Name",
 
   // These will be configured later
   EAS_PROJECT_ID: "your-eas-project-id",
-  AWS_REGION: "us-east-1",
-  AWS_USER_POOL_ID: "us-east-1_xxxxxxxxx",
-  AWS_USER_POOL_CLIENT_ID: "xxxxxxxxxxxxxxxxxxxxxxxxxx",
   REPO_URL: "https://github.com/yourusername/your-repo",
 };
 ```
@@ -105,32 +101,23 @@ Replace the following files in the `assets/` folder:
 
 These must be globally unique across app stores.
 
-## 🔐 AWS Cognito Setup
-
-Follow the detailed [Authentication Guide](./docs/AUTHENTICATION_GUIDE.md) to:
-
-1. Create AWS Cognito User Pool
-2. Configure authentication settings
-3. Get your credentials
-4. Update `template.config.ts` with your AWS values
-
 ## 🏗️ EAS Build Setup
 
 1. **Install EAS CLI** (if not already installed):
 
-   ```powershell
+   ```bash
    npm install -g @expo/cli eas-cli
    ```
 
 2. **Login to Expo**:
 
-   ```powershell
+   ```bash
    eas login
    ```
 
 3. **Configure EAS builds**:
 
-   ```powershell
+   ```bash
    eas build:configure
    ```
 
@@ -140,7 +127,7 @@ Follow the detailed [Authentication Guide](./docs/AUTHENTICATION_GUIDE.md) to:
 
 ### Initial Development
 
-```powershell
+```bash
 # Install dependencies
 npm install
 
@@ -150,7 +137,7 @@ npm start
 
 ### Building for Devices
 
-```powershell
+```bash
 # Development builds
 eas build --platform ios --profile development
 eas build --platform android --profile development
@@ -162,7 +149,7 @@ eas build --platform android --profile production
 
 ### Deployment
 
-```powershell
+```bash
 # Submit to app stores
 eas submit --platform ios
 eas submit --platform android
@@ -178,13 +165,6 @@ Use this checklist to ensure you've completed all setup steps:
 - [ ] Updated `app.json` with your app name and bundle ID
 - [ ] Updated `package.json` with your project details
 - [ ] Replaced app icons in `assets/` folder
-
-### Authentication Setup
-
-- [ ] Created AWS Cognito User Pool
-- [ ] Configured authentication settings
-- [ ] Updated `template.config.ts` with AWS credentials
-- [ ] Tested authentication flow
 
 ### Build Configuration
 
@@ -203,7 +183,6 @@ Use this checklist to ensure you've completed all setup steps:
 ### Production Ready
 
 - [ ] Customized app icons and branding
-- [ ] Tested authentication on production Cognito
 - [ ] Created production builds
 - [ ] Prepared for app store submission
 
@@ -216,14 +195,6 @@ If you get bundle identifier errors:
 1. Make sure your bundle ID is unique
 2. Check Apple Developer account settings
 3. Verify EAS configuration
-
-### AWS Cognito Errors
-
-If authentication isn't working:
-
-1. Double-check your AWS credentials in `template.config.ts`
-2. Verify Cognito User Pool settings
-3. Check CloudWatch logs for detailed errors
 
 ### Build Failures
 
