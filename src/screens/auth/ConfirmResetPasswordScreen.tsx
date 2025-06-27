@@ -2,20 +2,9 @@ import { useAuth } from "@/providers/AuthProvider";
 import type { AuthStackParamList } from "@/types/auth";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Platform } from "react-native";
+import { Platform, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  Button,
-  Form,
-  H2,
-  Input,
-  Label,
-  Paragraph,
-  ScrollView,
-  Text,
-  XStack,
-  YStack,
-} from "tamagui";
+import { Button, H2, Input, Paragraph, Text, XStack, YStack } from "tamagui";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "ConfirmResetPassword">;
 
@@ -29,27 +18,43 @@ interface FormErrors {
   code?: string;
   newPassword?: string;
   confirmPassword?: string;
+  general?: string;
+}
+
+interface FormState {
+  isSubmitting: boolean;
+  isSuccess: boolean;
+  errors: FormErrors;
 }
 
 export const ConfirmResetPasswordScreen: React.FC<Props> = ({
   navigation,
   route,
 }) => {
-  const { confirmResetPassword, isLoading } = useAuth();
+  const { confirmResetPassword } = useAuth();
   const { email } = route.params;
   const insets = useSafeAreaInsets();
+
   const [formData, setFormData] = useState<FormData>({
     code: "",
     newPassword: "",
     confirmPassword: "",
   });
-  const [errors, setErrors] = useState<FormErrors>({});
+
+  const [formState, setFormState] = useState<FormState>({
+    isSubmitting: false,
+    isSuccess: false,
+    errors: {},
+  });
 
   const updateFormData = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    if (formState.errors[field]) {
+      setFormState((prev) => ({
+        ...prev,
+        errors: { ...prev.errors, [field]: undefined },
+      }));
     }
   };
 
@@ -62,26 +67,55 @@ export const ConfirmResetPasswordScreen: React.FC<Props> = ({
 
     if (!formData.newPassword) {
       newErrors.newPassword = "New password is required";
-    } else if (formData.newPassword.length < 6) {
-      newErrors.newPassword = "Password must be at least 6 characters";
+    } else if (formData.newPassword.length < 8) {
+      newErrors.newPassword = "Password must be at least 8 characters";
     }
 
-    if (formData.newPassword !== formData.confirmPassword) {
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    } else if (formData.newPassword !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-    setErrors(newErrors);
+    setFormState((prev) => ({ ...prev, errors: newErrors }));
     return Object.keys(newErrors).length === 0;
   };
 
   const handleConfirmReset = async () => {
     if (!validateForm()) return;
 
+    setFormState({
+      isSubmitting: true,
+      isSuccess: false,
+      errors: {},
+    });
+
     try {
       await confirmResetPassword(email, formData.code, formData.newPassword);
-      navigation.navigate("Login");
-    } catch (error) {
-      // Error handling is done in AuthProvider
+
+      setFormState({
+        isSubmitting: false,
+        isSuccess: true,
+        errors: {},
+      });
+
+      // Navigate to login screen after showing success state briefly
+      setTimeout(() => {
+        navigation.navigate("Login");
+      }, 1500);
+    } catch (error: any) {
+      console.error("Confirm reset password error:", error);
+
+      setFormState({
+        isSubmitting: false,
+        isSuccess: false,
+        errors: {
+          general:
+            error instanceof Error
+              ? error.message
+              : "Failed to reset password. Please try again.",
+        },
+      });
     }
   };
 
@@ -92,144 +126,151 @@ export const ConfirmResetPasswordScreen: React.FC<Props> = ({
       paddingTop={insets.top}
       paddingBottom={insets.bottom}
     >
-      <KeyboardAvoidingView
+      <ScrollView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          paddingHorizontal: insets.left + 24,
+          paddingRight: insets.right + 24,
+          paddingVertical: 20,
+          paddingBottom: Platform.OS === "android" ? 60 : 20,
+        }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
       >
-        <ScrollView
-          flex={1}
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: "center",
-            paddingHorizontal: insets.left + 24,
-            paddingRight: insets.right + 24,
-            paddingVertical: 20,
-            paddingBottom: Platform.OS === "android" ? 60 : 20,
-          }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
-        >
-          <YStack space="$6" width="100%" maxWidth={400} alignSelf="center">
-            {/* Header */}
-            <YStack alignItems="center" space="$2">
-              <H2 textAlign="center">Set New Password</H2>
-              <Paragraph color="$color10" textAlign="center">
-                Enter the verification code sent to {email} and your new
-                password.
-              </Paragraph>
+        <YStack space="$3" width="100%" maxWidth={400} alignSelf="center">
+          {/* Header */}
+          <YStack alignItems="center" space="$1">
+            <H2 textAlign="center">Set New Password</H2>
+            <Paragraph color="$color10" textAlign="center" fontSize="$3">
+              Enter the verification code sent to {email} and your new password.
+            </Paragraph>
+          </YStack>
+
+          {/* Form */}
+          <YStack space="$3">
+            {/* Verification Code Field */}
+            <YStack space="$2">
+              <Input
+                placeholder="Verification code"
+                value={formData.code}
+                onChangeText={(text) => updateFormData("code", text)}
+                borderColor={formState.errors.code ? "$red7" : "$borderColor"}
+                keyboardType="numeric"
+                autoCapitalize="none"
+                autoComplete="one-time-code"
+                textContentType="oneTimeCode"
+                returnKeyType="next"
+                disabled={formState.isSubmitting || formState.isSuccess}
+              />
+              {formState.errors.code && (
+                <Text color="$red11" fontSize="$2">
+                  {formState.errors.code}
+                </Text>
+              )}
             </YStack>
 
-            {/* Form */}
-            <Form onSubmit={handleConfirmReset}>
-              <YStack space="$4">
-                <YStack space="$2">
-                  <Label fontWeight="600">Verification Code *</Label>
-                  <Input
-                    placeholder="Enter verification code"
-                    value={formData.code}
-                    onChangeText={(value: string) =>
-                      updateFormData("code", value)
-                    }
-                    keyboardType="numeric"
-                    autoCapitalize="none"
-                    autoComplete="one-time-code"
-                    textContentType="oneTimeCode"
-                    size="$4"
-                    borderColor={errors.code ? "$red8" : "$borderColor"}
-                  />
-                  {/* Fixed height container for code error to prevent layout shift */}
-                  <YStack height={24} justifyContent="flex-start">
-                    {errors.code && (
-                      <Text fontSize="$3" color="$red10">
-                        {errors.code}
-                      </Text>
-                    )}
-                  </YStack>
-                </YStack>
+            {/* New Password Field */}
+            <YStack space="$2">
+              <Input
+                placeholder="New password (8+ characters)"
+                value={formData.newPassword}
+                onChangeText={(text) => updateFormData("newPassword", text)}
+                borderColor={
+                  formState.errors.newPassword ? "$red7" : "$borderColor"
+                }
+                secureTextEntry
+                autoCapitalize="none"
+                autoComplete="new-password"
+                textContentType="newPassword"
+                returnKeyType="next"
+                disabled={formState.isSubmitting || formState.isSuccess}
+              />
+              {formState.errors.newPassword && (
+                <Text color="$red11" fontSize="$2">
+                  {formState.errors.newPassword}
+                </Text>
+              )}
+            </YStack>
 
-                <YStack space="$2">
-                  <Label fontWeight="600">New Password *</Label>
-                  <Input
-                    placeholder="Enter new password"
-                    value={formData.newPassword}
-                    onChangeText={(value: string) =>
-                      updateFormData("newPassword", value)
-                    }
-                    secureTextEntry
-                    autoComplete="password-new"
-                    textContentType="newPassword"
-                    size="$4"
-                    borderColor={errors.newPassword ? "$red8" : "$borderColor"}
-                  />
-                  {/* Fixed height container for new password error to prevent layout shift */}
-                  <YStack height={24} justifyContent="flex-start">
-                    {errors.newPassword && (
-                      <Text fontSize="$3" color="$red10">
-                        {errors.newPassword}
-                      </Text>
-                    )}
-                  </YStack>
-                </YStack>
+            {/* Confirm New Password Field */}
+            <YStack space="$2">
+              <Input
+                placeholder="Confirm new password"
+                value={formData.confirmPassword}
+                onChangeText={(text) => updateFormData("confirmPassword", text)}
+                borderColor={
+                  formState.errors.confirmPassword ? "$red7" : "$borderColor"
+                }
+                secureTextEntry
+                autoCapitalize="none"
+                autoComplete="new-password"
+                textContentType="newPassword"
+                returnKeyType="done"
+                onSubmitEditing={handleConfirmReset}
+                disabled={formState.isSubmitting || formState.isSuccess}
+              />
+              {formState.errors.confirmPassword && (
+                <Text color="$red11" fontSize="$2">
+                  {formState.errors.confirmPassword}
+                </Text>
+              )}
+            </YStack>
 
-                <YStack space="$2">
-                  <Label fontWeight="600">Confirm New Password *</Label>
-                  <Input
-                    placeholder="Confirm new password"
-                    value={formData.confirmPassword}
-                    onChangeText={(value: string) =>
-                      updateFormData("confirmPassword", value)
-                    }
-                    secureTextEntry
-                    autoComplete="password-new"
-                    textContentType="newPassword"
-                    size="$4"
-                    borderColor={
-                      errors.confirmPassword ? "$red8" : "$borderColor"
-                    }
-                  />
-                  {/* Fixed height container for confirm password error to prevent layout shift */}
-                  <YStack height={24} justifyContent="flex-start">
-                    {errors.confirmPassword && (
-                      <Text fontSize="$3" color="$red10">
-                        {errors.confirmPassword}
-                      </Text>
-                    )}
-                  </YStack>
-                </YStack>
-              </YStack>
-
-              {/* Reset Password Button */}
-              <YStack marginTop="$4">
-                <Form.Trigger asChild>
-                  <Button
-                    size="$5"
-                    theme="blue"
-                    disabled={isLoading}
-                    opacity={isLoading ? 0.6 : 1}
-                  >
-                    {isLoading ? "Resetting..." : "Reset Password"}
-                  </Button>
-                </Form.Trigger>
-              </YStack>
-            </Form>
+            {/* Submit Button */}
+            <Button
+              size="$4"
+              theme="blue"
+              onPress={handleConfirmReset}
+              disabled={formState.isSubmitting || formState.isSuccess}
+              opacity={formState.isSubmitting || formState.isSuccess ? 0.6 : 1}
+            >
+              {formState.isSubmitting
+                ? "Resetting..."
+                : formState.isSuccess
+                ? "Password Reset!"
+                : "Reset Password"}
+            </Button>
 
             {/* Back to Login Link */}
             <XStack justifyContent="center" alignItems="center" space="$2">
-              <Paragraph>Remember your password?</Paragraph>
+              <Text color="$color10" fontSize="$3">
+                Remember your password?
+              </Text>
               <Button
-                size="$3"
                 variant="outlined"
+                size="$2"
                 onPress={() => navigation.navigate("Login")}
                 chromeless
+                disabled={formState.isSubmitting || formState.isSuccess}
               >
-                Back to Login
+                <Text color="$blue10" fontSize="$3">
+                  Back to Login
+                </Text>
               </Button>
             </XStack>
           </YStack>
-        </ScrollView>
-      </KeyboardAvoidingView>
+
+          {/* Fixed space container for general error to prevent layout shifts */}
+          <YStack height={80} justifyContent="flex-start">
+            {formState.errors.general && (
+              <YStack
+                backgroundColor="$red2"
+                borderColor="$red7"
+                borderWidth={1}
+                borderRadius="$3"
+                padding="$3"
+              >
+                <Text color="$red11" fontSize="$3" textAlign="center">
+                  {formState.errors.general}
+                </Text>
+              </YStack>
+            )}
+          </YStack>
+        </YStack>
+      </ScrollView>
     </YStack>
   );
 };
