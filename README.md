@@ -2,12 +2,14 @@
 
 A production-ready React Native app built with Expo and Tamagui, featuring comprehensive error handling and beautiful toast notifications.
 
+**⚠️ Note: This app uses native binaries and requires EAS development builds. It cannot run on Expo Go.**
+
 ## 🚀 Features
 
 - **React Native with Expo SDK 53** - Latest stable version with TypeScript support
 - **Tamagui UI System** - Modern, performant UI components with built-in theming
 - **Production-Grade Error Handling** - Comprehensive error capture, logging, and user experience management
-- **Beautiful Toast Notifications** - Expo Go compatible toast system using Tamagui
+- **Beautiful Toast Notifications** - Custom toast system using Tamagui
 - **Authentication System** - Complete auth flow with secure storage
 - **Zero Performance Impact** - Optimized error handling with no runtime overhead
 
@@ -60,12 +62,12 @@ Structured error interfaces with categories, severity levels, and context metada
 
 #### 3. Tamagui Toast System
 
-**Expo Go Compatible Toast Notifications**
+**Beautiful Toast Notifications**
 
-- ✅ **No Native Modules**: Works without compilation
 - 🎨 **Tamagui Styled**: Matches your app's design system
 - ♿ **Accessible**: Screen reader support built-in
 - 📱 **Cross-platform**: iOS, Android, and Web
+- 🚀 **Performant**: Optimized for native performance
 
 #### 4. Error Boundary Component
 
@@ -190,113 +192,306 @@ if (!__DEV__) {
 
 ## 🛠 Development Setup
 
-### For Windows PC Development
+### Prerequisites
 
-1. **Install Expo CLI globally**
-
-   ```bash
-   npm install -g @expo/cli
+1. **Install Node.js** (v18 or later)
+2. **Install Expo CLI and EAS CLI**
+   ```powershell
+   npm install -g @expo/cli eas-cli
    ```
-
-2. **Clone and setup project**
-
-   ```bash
+3. **Create Expo account** at [expo.dev](https://expo.dev) if you don't have one
+4. **Clone and setup project**
+   ```powershell
    git clone <repository-url>
    cd acorn-pups-mobile
    npm install
    ```
 
-3. **Install Expo Go app on your phone**
-   - **iPhone**: Download from App Store
-   - **Android**: Download from Google Play Store
+### Initial EAS Setup
 
-### For iPhone Testing
+1. **Login to Expo** - Authenticates your CLI with your Expo account
 
-#### Option 1: Expo Go App (Recommended for Development)
+   ```powershell
+   eas login
+   ```
 
-1. **Install Expo Go** on your iPhone from the App Store
-2. **Start the development server**
-   ```bash
+2. **Configure EAS builds** - Creates `eas.json` configuration file for build profiles (development, production, etc.)
+   ```powershell
+   eas build:configure
+   ```
+
+## 📱 iOS Development Setup
+
+### Step 1: Apple Developer Account Setup
+
+1. **Apple Developer Account** - You need a paid Apple Developer account ($99/year)
+2. **Add your Apple ID** to EAS - Links your Apple Developer account for device registration and certificate management:
+   ```powershell
+   eas device:create
+   ```
+
+### Step 2: Register Your iOS Device
+
+1. **Find your device UDID**:
+
+   - Connect your iPhone to a Mac and open Finder, or
+   - Use a UDID finder website, or
+   - Use this command to generate a registration URL:
+
+   ```powershell
+   eas device:create
+   ```
+
+   - Open the generated URL on your iOS device and follow instructions
+     This automatically registers your device's UDID with your Apple Developer account
+
+2. **Verify device registration** - Lists all registered devices to confirm your device was added:
+   ```powershell
+   eas device:list
+   ```
+   Your device should appear in this list.
+
+### Step 3: Build and Install Development Build
+
+1. **Create iOS development build** - Builds the app with development profile (includes debugging tools):
+   ```powershell
+   eas build --platform ios --profile development
+   ```
+2. **Wait for build to complete** (usually 10-20 minutes)
+
+3. **Install on device**:
+   - Open the build URL on your iPhone
+   - Follow the installation prompts
+   - Trust the developer certificate in Settings > General > VPN & Device Management
+
+### Step 4: Start Development
+
+1. **Start the development server**:
+
+   ```powershell
    npm start
    ```
-3. **Connect your iPhone**:
-   - Make sure your iPhone and PC are on the same WiFi network
-   - Open Expo Go app on your iPhone
-   - Scan the QR code from your terminal/browser
-   - The app will load on your phone automatically
 
-#### Option 2: iOS Simulator (Requires macOS)
+2. **Open the development build** on your iPhone and scan the QR code or enter the URL manually
 
-If you have access to a Mac:
+## 🤖 Android Development Setup
 
-1. **Install Xcode** from Mac App Store
-2. **Install iOS Simulator**
-3. **Run iOS simulator**
-   ```bash
-   npm run ios
+### Option 1: Physical Android Device (Recommended)
+
+#### Step 1: Prepare Your Android Device
+
+1. **Enable Developer Options**:
+
+   - Go to Settings > About phone
+   - Tap "Build number" 7 times
+   - Developer options will appear in Settings
+
+2. **Enable USB Debugging**:
+
+   - Go to Settings > Developer options
+   - Enable "USB debugging"
+
+3. **Connect device to PC**:
+   - Use USB cable
+   - Allow USB debugging when prompted
+
+#### Step 2: Build and Install
+
+1. **Create Android development build** - Builds the APK with development profile (includes debugging tools):
+
+   ```powershell
+   eas build --platform android --profile development
    ```
 
-#### Option 3: Web Browser (Development Testing)
+2. **Install the APK**:
+   - Download the APK from the build URL
+   - Install on your device (may need to allow installing from unknown sources)
 
-```bash
-npm run web
-```
+#### Step 3: Start Development
 
-### Development Commands
+1. **Start the development server**:
 
-```bash
-# Start development server (with QR code for mobile)
-# expo go doesnt work with native binaries
+   ```powershell
+   npm start
+   ```
+
+2. **Open the development build** on your Android device and scan the QR code
+
+### Option 2: Android Emulator
+
+#### Step 1: Install Android Studio
+
+1. **Download Android Studio** from [developer.android.com](https://developer.android.com/studio)
+2. **Install Android SDK** and create a virtual device
+3. **Add Android SDK to PATH** (usually in `%LOCALAPPDATA%\Android\Sdk`)
+
+#### Step 2: Create and Start Emulator
+
+1. **Open Android Studio** > AVD Manager
+2. **Create a new virtual device** (recommended: Pixel 6 with API 33+)
+3. **Start the emulator**
+
+#### Step 3: Build and Install
+
+1. **Create Android development build** - Builds the APK with development profile (includes debugging tools):
+
+   ```powershell
+   eas build --platform android --profile development
+   ```
+
+2. **Install on emulator** - Uses Android Debug Bridge to install the APK on running emulator:
+   ```powershell
+   adb install path/to/downloaded-build.apk
+   ```
+
+## 🔧 Development Commands
+
+```powershell
+# Start development server - Starts Metro bundler for hot reloading
 npm start
 
-# expo
-eas build --platform ios --profile development
-
-npx expo start --dev-client
-
-# Start with cleared cache
+# Start with cleared cache - Clears Metro cache and starts fresh
 npm run start:clear
 
-# Run on Android (requires Android Studio)
-npm run android
+# Create development builds - Builds with debugging tools enabled
+eas build --platform ios --profile development
+eas build --platform android --profile development
 
-# Run on iOS (requires macOS and Xcode)
-npm run ios
+# Create production builds - Builds optimized for app store submission
+eas build --platform ios --profile production
+eas build --platform android --profile production
 
-# Run in web browser
-npm run web
+# Check build status - Lists all your builds and their current status
+eas build:list
 
-# Type checking
+# Type checking - Runs TypeScript compiler to check for type errors
 npm run type-check
 
-# Clean and reinstall dependencies
+# Clean and reinstall dependencies - Removes node_modules and reinstalls
 npm run clean
 ```
 
-## 📱 Testing on iPhone (Step by Step)
+## 🚀 Production Builds
 
-1. **Ensure same network**: Your Windows PC and iPhone must be on the same WiFi network
+### iOS Production
 
-2. **Start development server**:
+1. **Ensure App Store Connect setup**:
 
-   ```bash
-   cd acorn-pups-mobile
-   npm start
+   - App Store Connect account
+   - App identifier registered
+   - Certificates and profiles configured
+
+2. **Create production build** - Builds optimized version for App Store submission:
+
+   ```powershell
+   eas build --platform ios --profile production
    ```
 
-3. **Open Expo Go** on your iPhone
+3. **Submit to App Store** - Automatically uploads your build to App Store Connect:
+   ```powershell
+   eas submit --platform ios
+   ```
 
-4. **Scan QR Code**:
+### Android Production
 
-   - Point your iPhone camera at the QR code in terminal
-   - Or open the QR code link that appears in your browser
-   - Tap the notification to open in Expo Go
+1. **Create production build** - Builds signed APK/AAB for Google Play Store:
 
-5. **Development workflow**:
-   - Make changes in VS Code on your PC
-   - Save files to see instant updates on your iPhone
-   - Shake your iPhone to access developer menu
-   - Use Chrome DevTools for debugging
+   ```powershell
+   eas build --platform android --profile production
+   ```
+
+2. **Submit to Google Play** - Automatically uploads your build to Google Play Console:
+   ```powershell
+   eas submit --platform android
+   ```
+
+## 🆘 Troubleshooting
+
+### iOS Issues
+
+1. **Device not registered** - Register your device and verify it's added:
+
+   ```powershell
+   eas device:create  # Creates device registration URL
+   eas device:list    # Lists all registered devices
+   ```
+
+2. **Certificate issues**:
+
+   - Check Apple Developer account status
+   - Verify device is registered
+   - Try `eas build --clear-cache` - Clears build cache and regenerates certificates
+
+3. **Installation failed**:
+   - Trust developer certificate in iOS Settings
+   - Check device storage space
+   - Verify device UDID is correct
+
+### Android Issues
+
+1. **APK won't install**:
+
+   - Enable "Install unknown apps" for your browser
+   - Check Android version compatibility
+   - Clear space on device
+
+2. **USB debugging not working**:
+
+   - Try different USB cable
+   - Restart adb: `adb kill-server && adb start-server`
+   - Check Windows drivers for your device
+
+3. **Emulator issues**:
+   - Ensure hardware acceleration is enabled
+   - Increase emulator RAM in AVD settings
+   - Try different API level
+
+### General Issues
+
+1. **Build failures** - Clear build cache and try again:
+
+   ```powershell
+   eas build --clear-cache --platform [ios|android] --profile development
+   ```
+
+2. **Metro bundler issues** - Clear Metro cache and restart:
+
+   ```powershell
+   npm run start:clear
+   ```
+
+3. **Dependency issues** - Clean install all dependencies:
+   ```powershell
+   npm run clean
+   ```
+
+## 📋 Quick Start Checklist
+
+### For iOS Development:
+
+- [ ] Apple Developer account ($99/year)
+- [ ] EAS CLI installed
+- [ ] Device registered with `eas device:create`
+- [ ] Development build created and installed
+- [ ] Development server running
+
+### For Android Development:
+
+- [ ] Android device with USB debugging enabled, OR
+- [ ] Android Studio with emulator set up
+- [ ] Development build created and installed
+- [ ] Development server running
+
+## 🔐 Environment Variables
+
+Create an `env.js` file based on `env.example.js`:
+
+```javascript
+export default {
+  EXPO_PUBLIC_API_URL: "your-api-url-here",
+  EXPO_PUBLIC_SENTRY_DSN: "your-sentry-dsn-here",
+};
+```
 
 ## 🎨 Available Components
 
@@ -322,80 +517,6 @@ Complete authentication system with:
 - **Auth Screens** - Login, signup, forgot password, etc.
 - **Auth Provider** - Global authentication state
 - **Protected Routes** - Automatic navigation based on auth state
-
-## 🌍 Environment Variables
-
-Create a `.env` file for environment-specific configuration:
-
-```env
-EXPO_PUBLIC_API_URL=your-api-url-here
-EXPO_PUBLIC_SENTRY_DSN=your-sentry-dsn-here
-```
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-1. **Can't connect iPhone to dev server**
-
-   - Ensure both devices are on same WiFi network
-   - Try restarting the dev server: `npm run start:clear`
-   - Check Windows Firewall isn't blocking the connection
-
-2. **Toast not showing**
-
-   - Ensure `ToastProvider` and `ToastViewport` are in App.tsx
-   - Check that `useErrorHandler` is called within component tree
-   - Verify `showToast: true` in error options
-
-3. **Metro bundler issues**
-
-   ```bash
-   npm run start:clear
-   ```
-
-4. **TypeScript errors**
-
-   ```bash
-   npm run type-check
-   ```
-
-5. **Dependencies issues**
-   ```bash
-   npm run clean
-   ```
-
-### iPhone-Specific Tips
-
-- **Shake device** to access developer menu
-- **Two-finger tap** to inspect elements
-- **Use Expo Go settings** to switch between projects
-- **Enable airplane mode briefly** if connection issues persist
-
-## 🚀 Production Deployment
-
-### EAS Build (Recommended)
-
-```bash
-# Install EAS CLI
-npm install -g eas-cli
-
-# Configure EAS
-eas build:configure
-
-# Build for iOS
-eas build --platform ios
-
-# Build for Android
-eas build --platform android
-```
-
-### Error Monitoring Setup
-
-1. **Configure Sentry** for production error tracking
-2. **Set up remote logging** endpoints
-3. **Configure error queuing** for offline scenarios
-4. **Set environment variables** for production
 
 ## 📄 License
 
