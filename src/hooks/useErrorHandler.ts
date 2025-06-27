@@ -1,22 +1,17 @@
 // Toast functionality handled via Tamagui toast system
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 import {
   AsyncErrorOptions,
   ErrorCategory,
   ErrorSeverity,
   RetryConfig,
 } from "../types/errors";
-import {
-  asyncErrorHandler,
-  setGlobalToastFunctions,
-} from "../utils/asyncErrorHandler";
+import { asyncErrorHandler } from "../utils/asyncErrorHandler";
 import { errorLogger } from "../utils/errorLogger";
-import { useToast } from "./useToast";
 
 interface UseErrorHandlerOptions {
   defaultCategory?: ErrorCategory;
   defaultSeverity?: ErrorSeverity;
-  showToastByDefault?: boolean;
   context?: Record<string, any>;
 }
 
@@ -31,9 +26,8 @@ interface ErrorHandlerReturn {
     retryConfig?: Partial<RetryConfig>,
     options?: AsyncErrorOptions
   ) => Promise<T>;
-  showErrorToast: (message: string, duration?: number) => void;
-  showSuccessToast: (message: string, duration?: number) => void;
   clearErrorState: () => void;
+  getErrorMessage: (error: Error) => string;
 }
 
 export const useErrorHandler = (
@@ -42,18 +36,11 @@ export const useErrorHandler = (
   const {
     defaultCategory = ErrorCategory.UI_ERROR,
     defaultSeverity = ErrorSeverity.MEDIUM,
-    showToastByDefault = true,
     context = {},
   } = options;
 
   const errorCountRef = useRef(0);
   const lastErrorTimeRef = useRef(0);
-  const toast = useToast();
-
-  // Set global toast functions on mount
-  useEffect(() => {
-    setGlobalToastFunctions(toast.showErrorToast, toast.showSuccessToast);
-  }, [toast.showErrorToast, toast.showSuccessToast]);
 
   const handleError = useCallback(
     (error: Error, errorOptions: AsyncErrorOptions = {}): string => {
@@ -64,7 +51,7 @@ export const useErrorHandler = (
       if (timeSinceLastError < 1000) {
         errorCountRef.current++;
         if (errorCountRef.current > 3) {
-          // Too many errors in quick succession, don't show toast
+          // Too many errors in quick succession, just log
           return errorLogger.logError(error, defaultCategory, defaultSeverity, {
             ...context,
             metadata: {
@@ -83,8 +70,6 @@ export const useErrorHandler = (
       const {
         category = defaultCategory,
         severity = defaultSeverity,
-        showToast = showToastByDefault,
-        customMessage,
         context: errorContext = {},
       } = errorOptions;
 
@@ -94,15 +79,9 @@ export const useErrorHandler = (
         ...errorContext,
       });
 
-      // Show toast if requested
-      if (showToast) {
-        const message = customMessage || getErrorMessage(error);
-        toast.showErrorToast(message);
-      }
-
       return errorId;
     },
-    [defaultCategory, defaultSeverity, showToastByDefault, context, toast]
+    [defaultCategory, defaultSeverity, context]
   );
 
   const handleAsyncError = useCallback(
@@ -135,19 +114,9 @@ export const useErrorHandler = (
     [context]
   );
 
-  const showErrorToast = useCallback(
-    (message: string, duration = 4000) => {
-      toast.showErrorToast(message, duration);
-    },
-    [toast]
-  );
-
-  const showSuccessToast = useCallback(
-    (message: string, duration = 3000) => {
-      toast.showSuccessToast(message, duration);
-    },
-    [toast]
-  );
+  const getErrorMessage = useCallback((error: Error): string => {
+    return getUserFriendlyMessage(error);
+  }, []);
 
   const clearErrorState = useCallback(() => {
     errorCountRef.current = 0;
@@ -158,9 +127,8 @@ export const useErrorHandler = (
     handleError,
     handleAsyncError,
     handleAsyncErrorWithRetry,
-    showErrorToast,
-    showSuccessToast,
     clearErrorState,
+    getErrorMessage,
   };
 };
 
@@ -204,7 +172,6 @@ export const useApiErrorHandler = (baseUrl?: string) => {
 export const useNavigationErrorHandler = () => {
   return useErrorHandler({
     defaultCategory: ErrorCategory.NAVIGATION_ERROR,
-    defaultSeverity: ErrorSeverity.MEDIUM,
   });
 };
 
@@ -212,35 +179,32 @@ export const usePerformanceErrorHandler = () => {
   return useErrorHandler({
     defaultCategory: ErrorCategory.PERFORMANCE_ERROR,
     defaultSeverity: ErrorSeverity.LOW,
-    showToastByDefault: false, // Performance errors usually don't need user notification
   });
 };
 
-// Utility function to get user-friendly error messages
-function getErrorMessage(error: Error): string {
-  const message = error.message.toLowerCase();
+function getUserFriendlyMessage(error: Error): string {
+  const message = error.message?.toLowerCase() || "";
 
+  // Network errors
   if (message.includes("network") || message.includes("fetch")) {
-    return "Network error. Please check your connection.";
+    return "Network connection issue. Please check your internet connection.";
   }
 
+  // Authentication errors
+  if (message.includes("unauthorized") || message.includes("auth")) {
+    return "Authentication failed. Please sign in again.";
+  }
+
+  // Validation errors
+  if (message.includes("validation") || message.includes("invalid")) {
+    return "Please check your input and try again.";
+  }
+
+  // Timeout errors
   if (message.includes("timeout")) {
     return "Request timed out. Please try again.";
   }
 
-  if (message.includes("parse") || message.includes("json")) {
-    return "Invalid response format. Please try again.";
-  }
-
-  if (message.includes("permission") || message.includes("unauthorized")) {
-    return "Permission denied. Please check your access rights.";
-  }
-
-  // For development, show the actual error message
-  if (__DEV__) {
-    return error.message;
-  }
-
-  // Generic fallback for production
-  return "Something went wrong. Please try again.";
+  // Default fallback
+  return error.message || "An unexpected error occurred. Please try again.";
 }

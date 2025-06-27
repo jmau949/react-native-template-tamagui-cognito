@@ -29,11 +29,11 @@
     "@tamagui/font-inter": "^1.127.0",
     "@tamagui/get-button-sized": "^1.127.0",
     "@tamagui/react-native-media-driver": "^1.127.0",
-    "@tamagui/toast": "^1.127.0",
     "aws-amplify": "^6.15.1",
     "burnt": "^0.13.0",
     "expo": "~53.0.10",
     "expo-constants": "^17.1.6",
+    "expo-dev-client": "~5.2.1",
     "expo-secure-store": "^14.2.3",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
@@ -41,8 +41,7 @@
     "react-native-get-random-values": "^1.11.0",
     "react-native-safe-area-context": "^5.4.1",
     "react-native-screens": "^4.11.1",
-    "tamagui": "^1.127.0",
-    "expo-dev-client": "~5.2.1"
+    "tamagui": "^1.127.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

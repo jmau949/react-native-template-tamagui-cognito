@@ -1,4 +1,3 @@
-import { ToastProvider, ToastViewport } from "@tamagui/toast";
 import React from "react";
 import "react-native-get-random-values";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -18,20 +17,11 @@ export default function App() {
     <ErrorBoundary>
       <TamaguiProvider config={tamaguiConfig}>
         <SafeAreaProvider>
-          <ToastProvider>
-            <AuthProvider>
-              <AppLifecycleManager>
-                <RootNavigator />
-              </AppLifecycleManager>
-            </AuthProvider>
-            <ToastViewport
-              name="main"
-              top="$10"
-              left="$4"
-              right="$4"
-              zIndex={100000}
-            />
-          </ToastProvider>
+          <AuthProvider>
+            <AppLifecycleManager>
+              <RootNavigator />
+            </AppLifecycleManager>
+          </AuthProvider>
         </SafeAreaProvider>
       </TamaguiProvider>
     </ErrorBoundary>

@@ -3,6 +3,7 @@ export enum ErrorCategory {
   API_ERROR = "API_ERROR",
   NAVIGATION_ERROR = "NAVIGATION_ERROR",
   PERFORMANCE_ERROR = "PERFORMANCE_ERROR",
+  UNHANDLED_ERROR = "UNHANDLED_ERROR",
 }
 
 export enum ErrorSeverity {
@@ -54,7 +55,6 @@ export interface AsyncErrorOptions {
   category?: ErrorCategory;
   severity?: ErrorSeverity;
   retryable?: boolean;
-  showToast?: boolean;
   customMessage?: string;
   context?: Partial<ErrorContext>;
 }

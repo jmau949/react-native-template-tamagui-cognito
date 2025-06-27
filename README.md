@@ -1,166 +1,73 @@
-# Acorn Pups Mobile
+# 🥜 Acorn Pups Mobile
 
-A production-ready React Native app built with Expo and Tamagui, featuring comprehensive error handling and beautiful toast notifications.
+A production-ready React Native app built with Expo and Tamagui, featuring comprehensive error handling and modern inline feedback patterns.
 
 **⚠️ Note: This app uses native binaries and requires EAS development builds. It cannot run on Expo Go.**
 
-## 🚀 Features
+## ✨ Features
 
-- **React Native with Expo SDK 53** - Latest stable version with TypeScript support
-- **Tamagui UI System** - Modern, performant UI components with built-in theming
-- **Production-Grade Error Handling** - Comprehensive error capture, logging, and user experience management
-- **Beautiful Toast Notifications** - Custom toast system using Tamagui
-- **Authentication System** - Complete auth flow with secure storage
-- **Zero Performance Impact** - Optimized error handling with no runtime overhead
+### 🎨 UI & Design
+
+- **Tamagui Integration** - Modern, performant UI components with atomic CSS
+- **Inline Feedback** - Context-aware error messages and success states
+- **Responsive Design** - Optimized for all screen sizes
+
+### 🔒 Authentication
+
+- **AWS Cognito** - Secure user authentication
+- **Complete Auth Flow** - Sign up, sign in, forgot password, email verification
+- **Contextual Feedback** - Inline validation and error states
+
+### 🛡️ Error Handling
+
+- **Comprehensive Logging** - Structured error tracking and analytics
+- **Graceful Degradation** - User-friendly error boundaries
+- **Smart Retry Logic** - Automatic recovery for transient failures
 
 ## 📁 Project Structure
 
 ```
 src/
-├── components/           # Reusable UI components
-│   └── ErrorBoundary.tsx # Production error handling with Tamagui UI
-├── screens/             # Screen components
-│   ├── auth/           # Authentication screens
-│   └── HomeScreen.tsx  # Main app screen
-├── navigation/          # Navigation configuration
-├── hooks/               # Custom React hooks
-│   ├── useErrorHandler.ts  # Error handling hooks
-│   └── useToast.ts        # Toast notification hooks
-├── utils/               # Utility functions
-│   ├── errorLogger.ts     # Central error logging
-│   └── asyncErrorHandler.ts # Async operations with retry logic
-├── types/               # TypeScript type definitions
-│   └── errors.ts        # Error handling types
-├── constants/           # App constants and configuration
-├── services/            # API calls and external services
-├── providers/           # Context providers
-└── tamagui.config.ts    # Tamagui configuration
+├── components/
+│   ├── AppLifecycleManager.tsx
+│   └── ErrorBoundary.tsx
+├── config/
+│   └── aws-config.ts
+├── constants/
+│   ├── appConfig.ts
+│   └── theme.ts
+├── hooks/
+│   ├── useAuth.ts
+│   ├── useErrorHandler.ts
+│   └── useToast.ts        # Removed - replaced with inline feedback
+├── navigation/
+│   ├── AppStack.tsx
+│   ├── AuthStack.tsx
+│   └── RootNavigator.tsx
+├── providers/
+│   └── AuthProvider.tsx
+├── screens/
+│   ├── auth/
+│   │   ├── ConfirmResetPasswordScreen.tsx
+│   │   ├── ConfirmSignUpScreen.tsx
+│   │   ├── ForgotPasswordScreen.tsx
+│   │   ├── LoginScreen.tsx
+│   │   ├── SignUpScreen.tsx
+│   │   └── WelcomeScreen.tsx
+│   └── HomeScreen.tsx
+├── services/
+│   └── auth.ts
+├── types/
+│   ├── auth.ts
+│   ├── common.ts
+│   ├── errors.ts
+│   └── navigation.ts
+└── utils/
+    ├── asyncErrorHandler.ts
+    └── errorLogger.ts
 ```
 
-## 🔧 Error Handling System
-
-### Overview
-
-This app features a comprehensive, production-ready error handling system built specifically for Tamagui. The system provides centralized error logging, automatic retry logic, graceful error boundaries, and beautiful Tamagui-based toast notifications that work seamlessly with Expo Go.
-
-### Core Components
-
-#### 1. Error Types
-
-Structured error interfaces with categories, severity levels, and context metadata:
-
-- **Error Categories**: UI_ERROR, API_ERROR, NAVIGATION_ERROR, PERFORMANCE_ERROR
-- **Severity Levels**: LOW, MEDIUM, HIGH, CRITICAL
-- **Rich Context**: User actions, screen names, metadata
-
-#### 2. Central Error Logger
-
-- **Environment-aware logging**: Console in development, queuing for production
-- **Error throttling**: Maximum 3 identical errors per 5 seconds
-- **Sentry-compatible format**: Ready for remote logging integration
-- **Memory management**: 100 error queue limit with cleanup
-
-#### 3. Tamagui Toast System
-
-**Beautiful Toast Notifications**
-
-- 🎨 **Tamagui Styled**: Matches your app's design system
-- ♿ **Accessible**: Screen reader support built-in
-- 📱 **Cross-platform**: iOS, Android, and Web
-- 🚀 **Performant**: Optimized for native performance
-
-#### 4. Error Boundary Component
-
-React class component with beautiful Tamagui UI:
-
-- **Graceful fallback interface**: Beautiful error UI with retry functionality
-- **Development details**: Shows error stack trace in development mode
-- **Custom fallback support**: Override default error UI
-
-#### 5. Error Handler Hooks
-
-Component-level error management with integrated toast notifications:
-
-- `useErrorHandler()`: General error handling
-- `useApiErrorHandler()`: API/network operations
-- `useNavigationErrorHandler()`: Navigation errors
-- `usePerformanceErrorHandler()`: Performance monitoring
-
-### Usage Examples
-
-#### Basic Error Handling
-
-```typescript
-import { useErrorHandler } from "@/hooks/useErrorHandler";
-
-const MyComponent = () => {
-  const { handleError } = useErrorHandler();
-
-  const handleButtonPress = () => {
-    try {
-      riskyOperation();
-    } catch (error) {
-      handleError(error); // Logs + shows toast automatically
-    }
-  };
-};
-```
-
-#### API Requests with Retry
-
-```typescript
-import { useApiErrorHandler } from "@/hooks/useErrorHandler";
-
-const MyComponent = () => {
-  const { handleApiError } = useApiErrorHandler();
-
-  const fetchData = async () => {
-    try {
-      const result = await handleApiError(
-        () => fetch("/api/data").then((r) => r.json()),
-        {
-          endpoint: "/api/data",
-          method: "GET",
-          showToast: true,
-        }
-      );
-      return result;
-    } catch (error) {
-      // Error already logged and toast shown
-      console.log("Request failed");
-    }
-  };
-};
-```
-
-#### Toast Notifications
-
-```typescript
-import { useToast } from "@/hooks/useToast";
-
-const MyComponent = () => {
-  const toast = useToast();
-
-  const showNotification = () => {
-    toast.showSuccessToast("Profile updated successfully!");
-    toast.showErrorToast("Something went wrong");
-  };
-};
-```
-
-#### Error Boundaries
-
-```typescript
-import { TamaguiErrorBoundary } from "@/components/ErrorBoundary";
-
-const App = () => (
-  <TamaguiErrorBoundary>
-    <MyApp />
-  </TamaguiErrorBoundary>
-);
-```
-
-### Production Configuration
+The app follows a clean, modular architecture with clear separation of concerns. All UI components use Tamagui for consistency, error boundaries, and inline feedback patterns that keep users focused on their tasks.
 
 #### Environment Differences
 

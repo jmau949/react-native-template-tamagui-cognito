@@ -9,22 +9,6 @@ import { errorLogger } from "./errorLogger";
 // Type declaration for React Native global
 declare const global: any;
 
-// Toast function type
-type ToastFunction = (message: string, duration?: number) => void;
-
-// Global toast function that can be set by components
-let globalShowErrorToast: ToastFunction | null = null;
-let globalShowSuccessToast: ToastFunction | null = null;
-
-// Function to set the global toast functions
-export const setGlobalToastFunctions = (
-  showErrorToast: ToastFunction,
-  showSuccessToast: ToastFunction
-) => {
-  globalShowErrorToast = showErrorToast;
-  globalShowSuccessToast = showSuccessToast;
-};
-
 class AsyncErrorHandler {
   private readonly defaultRetryConfig: RetryConfig = {
     maxRetries: 3,
@@ -40,7 +24,7 @@ class AsyncErrorHandler {
   }
 
   /**
-   * Handle async operations with automatic error handling
+   * Handle async operations with automatic error logging
    */
   public async handleAsync<T>(
     operation: () => Promise<T>,
@@ -49,8 +33,6 @@ class AsyncErrorHandler {
     const {
       category = ErrorCategory.API_ERROR,
       severity = ErrorSeverity.MEDIUM,
-      retryable = true,
-      showToast = true,
       customMessage,
       context = {},
     } = options;
@@ -66,12 +48,10 @@ class AsyncErrorHandler {
         ...context,
       });
 
-      // Show user notification if requested
-      if (showToast) {
-        this.showErrorToast(err, customMessage);
-      }
+      // Add error ID to the error for tracking
+      (err as any).errorId = errorId;
 
-      // Re-throw to allow caller to handle if needed
+      // Re-throw to allow caller to handle
       throw err;
     }
   }
@@ -88,7 +68,6 @@ class AsyncErrorHandler {
     const {
       category = ErrorCategory.API_ERROR,
       severity = ErrorSeverity.MEDIUM,
-      showToast = true,
       customMessage,
       context = {},
     } = options;
@@ -149,13 +128,10 @@ class AsyncErrorHandler {
       }
     }
 
-    // All retries failed
-    if (showToast) {
-      this.showErrorToast(
-        lastError!,
-        customMessage || `Operation failed after ${config.maxRetries} attempts`
-      );
-    }
+    // All retries failed - add retry info to error
+    (lastError! as any).retryAttempts = config.maxRetries;
+    (lastError! as any).customMessage =
+      customMessage || `Operation failed after ${config.maxRetries} attempts`;
 
     throw lastError!;
   }
@@ -198,39 +174,69 @@ class AsyncErrorHandler {
         const apiError = new Error(errorMessage);
 
         // Log API error with response details
-        errorLogger.logApiError(
+        errorLogger.logError(
           apiError,
-          endpoint,
-          method,
-          response.status,
-          context
+          ErrorCategory.API_ERROR,
+          ErrorSeverity.HIGH,
+          {
+            userAction: "api_request",
+            metadata: {
+              endpoint,
+              method,
+              status: response.status,
+              statusText: response.statusText,
+              url: response.url,
+            },
+            ...context,
+          }
         );
+
+        // Add response info to error
+        (apiError as any).status = response.status;
+        (apiError as any).statusText = response.statusText;
+        (apiError as any).endpoint = endpoint;
 
         throw apiError;
       }
 
       if (parseResponse) {
-        return await response.json();
+        try {
+          return await response.json();
+        } catch (parseError) {
+          const error = new Error("Failed to parse API response");
+          errorLogger.logError(
+            error,
+            ErrorCategory.API_ERROR,
+            ErrorSeverity.MEDIUM,
+            {
+              userAction: "api_response_parse",
+              metadata: { endpoint, method },
+              ...context,
+            }
+          );
+          throw error;
+        }
       }
 
       return response as unknown as T;
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.includes("API request failed")
-      ) {
-        throw error; // Already handled above
+      // If it's already our error, just re-throw
+      if (error instanceof Error && (error as any).errorId) {
+        throw error;
       }
 
       // Handle network errors
       const networkError =
         error instanceof Error ? error : new Error(String(error));
-      errorLogger.logApiError(
+      errorLogger.logError(
         networkError,
-        endpoint,
-        method,
-        undefined,
-        context
+        ErrorCategory.API_ERROR,
+        ErrorSeverity.HIGH,
+        {
+          userAction: "api_request_network",
+          metadata: { endpoint, method },
+          ...context,
+        }
       );
 
       throw networkError;
@@ -238,148 +244,123 @@ class AsyncErrorHandler {
   }
 
   /**
-   * Wrap a promise to handle errors gracefully
+   * Wrap a promise with error handling
    */
   public wrapPromise<T>(
     promise: Promise<T>,
     options: AsyncErrorOptions = {}
   ): Promise<T> {
-    return promise.catch((error) => {
-      const err = error instanceof Error ? error : new Error(String(error));
-
-      errorLogger.logError(
-        err,
-        options.category || ErrorCategory.API_ERROR,
-        options.severity || ErrorSeverity.MEDIUM,
-        {
-          userAction: "wrapped_promise",
-          ...options.context,
-        }
-      );
-
-      if (options.showToast !== false) {
-        this.showErrorToast(err, options.customMessage);
-      }
-
-      throw err;
-    });
+    return this.handleAsync(() => promise, options);
   }
 
   /**
-   * Setup global unhandled promise rejection handler
+   * Setup global error handlers for unhandled promise rejections
    */
   private setupGlobalHandlers(): void {
-    // React Native global error handling
-    if (typeof global !== "undefined" && global.ErrorUtils) {
-      const originalHandler = global.ErrorUtils.getGlobalHandler();
+    // Handle unhandled promise rejections
+    this.unhandledRejectionHandler = (event: any) => {
+      const error =
+        event.reason || event.error || new Error("Unhandled promise rejection");
 
-      global.ErrorUtils.setGlobalHandler((error: Error, isFatal?: boolean) => {
+      errorLogger.logError(
+        error instanceof Error ? error : new Error(String(error)),
+        ErrorCategory.UNHANDLED_ERROR,
+        ErrorSeverity.HIGH,
+        {
+          userAction: "unhandled_promise_rejection",
+          metadata: {
+            handled: false,
+            source: "global_handler",
+          },
+        }
+      );
+
+      // Prevent default behavior that would crash the app
+      if (event.preventDefault) {
+        event.preventDefault();
+      }
+    };
+
+    // React Native environment
+    if (typeof global !== "undefined" && global.ErrorUtils) {
+      global.ErrorUtils.setGlobalHandler((error: Error, isFatal: boolean) => {
         errorLogger.logError(
           error,
-          ErrorCategory.UI_ERROR,
-          isFatal ? ErrorSeverity.CRITICAL : ErrorSeverity.HIGH,
+          ErrorCategory.UNHANDLED_ERROR,
+          ErrorSeverity.CRITICAL,
           {
             userAction: "global_error",
-            metadata: { isFatal },
-          }
-        );
-
-        // Call original handler
-        if (originalHandler) {
-          originalHandler(error, isFatal);
-        }
-      });
-    }
-
-    // Set up unhandled promise rejection handler for development
-    if (__DEV__ && typeof global !== "undefined") {
-      this.unhandledRejectionHandler = (event: any) => {
-        const error =
-          event.reason instanceof Error
-            ? event.reason
-            : new Error(String(event.reason));
-
-        errorLogger.logError(
-          error,
-          ErrorCategory.API_ERROR,
-          ErrorSeverity.HIGH,
-          {
-            userAction: "unhandled_promise_rejection",
             metadata: {
-              type: "unhandled_rejection",
-              promise: event.promise?.toString?.() || "unknown",
+              isFatal,
+              source: "react_native_global_handler",
             },
           }
         );
-
-        // Prevent the default browser behavior
-        event.preventDefault?.();
-      };
-
-      // Add listener if available
-      if (global.addEventListener) {
-        global.addEventListener(
-          "unhandledrejection",
-          this.unhandledRejectionHandler
-        );
-      }
+      });
     }
-  }
 
-  /**
-   * Show error toast using Tamagui toast or fallback to console
-   */
-  private showErrorToast(error: Error, customMessage?: string): void {
-    const message = customMessage || this.getUserFriendlyMessage(error);
-
-    // Try to use global toast function first
-    if (globalShowErrorToast) {
-      globalShowErrorToast(message);
-    } else if (__DEV__) {
-      // Fallback to console in development
-      console.log(
-        "%c❌ Error Toast",
-        "color: #ff4444; font-weight: bold; font-size: 14px;",
-        "\n",
-        message
+    // Standard promise rejection handling
+    if (typeof global !== "undefined" && global.addEventListener) {
+      global.addEventListener(
+        "unhandledrejection",
+        this.unhandledRejectionHandler
       );
+    } else if (typeof process !== "undefined" && process.on) {
+      process.on("unhandledRejection", this.unhandledRejectionHandler);
     }
-
-    // In production without toast setup, errors are just logged silently
   }
 
   /**
-   * Convert technical error messages to user-friendly ones
+   * Get user-friendly error message
    */
-  private getUserFriendlyMessage(error: Error): string {
-    const message = error.message.toLowerCase();
+  public getUserFriendlyMessage(error: Error): string {
+    const message = error.message?.toLowerCase() || "";
 
+    // Network errors
     if (message.includes("network") || message.includes("fetch")) {
-      return "Network error. Please check your connection and try again.";
+      return "Network connection issue. Please check your internet connection.";
     }
 
+    // Authentication errors
+    if (message.includes("unauthorized") || message.includes("auth")) {
+      return "Authentication failed. Please sign in again.";
+    }
+
+    // Validation errors
+    if (message.includes("validation") || message.includes("invalid")) {
+      return "Please check your input and try again.";
+    }
+
+    // Timeout errors
     if (message.includes("timeout")) {
       return "Request timed out. Please try again.";
     }
 
-    if (message.includes("500")) {
-      return "Server error. Please try again later.";
+    // API errors with status codes
+    if ((error as any).status) {
+      const status = (error as any).status;
+      if (status >= 400 && status < 500) {
+        return "Invalid request. Please check your input and try again.";
+      }
+      if (status >= 500) {
+        return "Server error. Please try again later.";
+      }
     }
 
-    if (message.includes("404")) {
-      return "The requested resource was not found.";
-    }
-
-    if (message.includes("401") || message.includes("403")) {
-      return "Authentication error. Please log in again.";
+    // Retry errors
+    if ((error as any).retryAttempts) {
+      return (
+        (error as any).customMessage ||
+        "Operation failed after multiple attempts. Please try again later."
+      );
     }
 
     // Default fallback
-    return "Something went wrong. Please try again.";
+    return error.message || "An unexpected error occurred. Please try again.";
   }
 
   /**
-   * Simple delay utility for retries
+   * Delay utility for retry logic
    */
   private delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -389,19 +370,24 @@ class AsyncErrorHandler {
    * Cleanup global handlers
    */
   public cleanup(): void {
-    if (this.unhandledRejectionHandler && global.removeEventListener) {
-      global.removeEventListener(
-        "unhandledrejection",
-        this.unhandledRejectionHandler
-      );
+    if (this.unhandledRejectionHandler) {
+      if (typeof global !== "undefined" && global.removeEventListener) {
+        global.removeEventListener(
+          "unhandledrejection",
+          this.unhandledRejectionHandler
+        );
+      } else if (typeof process !== "undefined" && process.off) {
+        process.off("unhandledRejection", this.unhandledRejectionHandler);
+      }
+      this.unhandledRejectionHandler = null;
     }
   }
 }
 
-// Singleton instance
+// Create singleton instance
 export const asyncErrorHandler = new AsyncErrorHandler();
 
-// Convenience functions
+// Convenience functions for direct usage
 export const handleAsync = <T>(
   operation: () => Promise<T>,
   options?: AsyncErrorOptions
@@ -426,3 +412,6 @@ export const wrapPromise = <T>(
   promise: Promise<T>,
   options?: AsyncErrorOptions
 ) => asyncErrorHandler.wrapPromise(promise, options);
+
+export const getUserFriendlyMessage = (error: Error) =>
+  asyncErrorHandler.getUserFriendlyMessage(error);
