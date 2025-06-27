@@ -176,6 +176,32 @@ export const useAuth = () => {
   }, []);
 
   /**
+   * Auto-send verification code for unverified users
+   */
+  const autoSendVerificationCode = useCallback(async (email: string) => {
+    try {
+      setAuthState((prev) => ({ ...prev, error: null }));
+
+      await authService.autoSendVerificationCode(email);
+
+      setAuthState((prev) => ({
+        ...prev,
+        error: null,
+      }));
+    } catch (error) {
+      console.error("useAuth: Auto-send verification code failed:", error);
+      setAuthState((prev) => ({
+        ...prev,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to send verification code",
+      }));
+      throw error;
+    }
+  }, []);
+
+  /**
    * Request password reset
    */
   const forgotPassword = useCallback(async (email: string) => {
@@ -274,6 +300,7 @@ export const useAuth = () => {
     signOut,
     confirmSignUp,
     resendConfirmationCode,
+    autoSendVerificationCode,
     forgotPassword,
     confirmResetPassword,
     refreshUser,

@@ -33,7 +33,7 @@ interface FormState {
 }
 
 export const LoginScreen: React.FC<Props> = ({ navigation }) => {
-  const { signIn } = useAuth();
+  const { signIn, autoSendVerificationCode } = useAuth();
   const insets = useSafeAreaInsets();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -79,8 +79,38 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
       });
 
       // The navigation will be handled automatically by RootNavigator based on auth state
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Login failed:", error);
+
+      // Check if user needs email verification
+      if ((error as any)?.code === "UserNotConfirmedException") {
+        setFormState({
+          isSubmitting: true,
+          isSuccess: false,
+          errors: {},
+        });
+
+        try {
+          // Auto-send verification code in background
+          await autoSendVerificationCode(email);
+
+          // Navigate to verification screen with auto-sent flag
+          setTimeout(() => {
+            navigation.navigate("EmailVerification", {
+              email,
+              password,
+              context: "login",
+              autoSent: true,
+            });
+          }, 500);
+
+          return;
+        } catch (sendError) {
+          console.error("Failed to auto-send verification code:", sendError);
+          // Fall through to normal error handling
+        }
+      }
+
       setFormState({
         isSubmitting: false,
         isSuccess: false,

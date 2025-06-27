@@ -1,5 +1,5 @@
 import { ConfirmResetPasswordScreen } from "@/screens/auth/ConfirmResetPasswordScreen";
-import { ConfirmSignUpScreen } from "@/screens/auth/ConfirmSignUpScreen";
+import { EmailVerificationScreen } from "@/screens/auth/EmailVerificationScreen";
 import { ForgotPasswordScreen } from "@/screens/auth/ForgotPasswordScreen";
 import { LoginScreen } from "@/screens/auth/LoginScreen";
 import { SignUpScreen } from "@/screens/auth/SignUpScreen";
@@ -16,13 +16,16 @@ export const AuthStack: React.FC = () => {
       initialRouteName="Welcome"
       screenOptions={{
         headerShown: false,
-        animation: "slide_from_right",
+        gestureEnabled: true,
       }}
     >
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />
-      <Stack.Screen name="ConfirmSignUp" component={ConfirmSignUpScreen} />
+      <Stack.Screen
+        name="EmailVerification"
+        component={EmailVerificationScreen}
+      />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen
         name="ConfirmResetPassword"

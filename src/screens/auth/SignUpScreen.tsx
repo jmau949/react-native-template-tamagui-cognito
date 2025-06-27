@@ -114,9 +114,10 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
 
       // Navigate to confirmation screen after showing success state briefly
       setTimeout(() => {
-        navigation.navigate("ConfirmSignUp", {
+        navigation.navigate("EmailVerification", {
           email: formData.email,
           password: formData.password,
+          context: "signup",
         });
       }, 1500);
     } catch (error) {

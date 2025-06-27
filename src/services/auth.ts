@@ -137,6 +137,19 @@ export const authService = {
         password: credentials.password,
       });
 
+      // Check if user needs email verification based on the nextStep
+      if (
+        !result.isSignedIn &&
+        result.nextStep?.signInStep === "CONFIRM_SIGN_UP"
+      ) {
+        // Create a specific error type for unverified users
+        const unverifiedError = new Error("User email not verified");
+        (unverifiedError as any).code = "UserNotConfirmedException";
+        (unverifiedError as any).email = credentials.email;
+        (unverifiedError as any).password = credentials.password; // Store for auto-login after verification
+        throw unverifiedError;
+      }
+
       if (!result.isSignedIn) {
         throw new Error("Sign in was not completed");
       }
@@ -147,6 +160,22 @@ export const authService = {
       return user;
     } catch (error) {
       console.error("Sign in failed:", error);
+
+      // If we already created the unverified user error, just re-throw it
+      if ((error as any)?.code === "UserNotConfirmedException") {
+        throw error;
+      }
+
+      // Check if user needs email verification (fallback for older error format)
+      if ((error as any)?.name === "UserNotConfirmedException") {
+        // Create a specific error type for unverified users
+        const unverifiedError = new Error("User email not verified");
+        (unverifiedError as any).code = "UserNotConfirmedException";
+        (unverifiedError as any).email = credentials.email;
+        (unverifiedError as any).password = credentials.password; // Store for auto-login after verification
+        throw unverifiedError;
+      }
+
       const formattedError = this.formatError(error);
       throw formattedError;
     }
@@ -227,6 +256,18 @@ export const authService = {
   },
 
   /**
+   * Auto-send verification code for unverified users
+   */
+  async autoSendVerificationCode(email: string): Promise<{ success: boolean }> {
+    try {
+      await resendSignUpCode({ username: email });
+      return { success: true };
+    } catch (error) {
+      throw this.formatError(error);
+    }
+  },
+
+  /**
    * Format error messages for user-friendly display
    */
   formatError(error: any): Error {
@@ -234,25 +275,37 @@ export const authService = {
 
     const errorMessages: Record<string, string> = {
       UserNotFoundException:
-        "User not found. Please check your email and try again.",
-      NotAuthorizedException: "Incorrect email or password.",
-      UserNotConfirmedException: "Please verify your email before signing in.",
-      CodeMismatchException: "Invalid verification code. Please try again.",
+        "No account found with this email address. Please check your email or create a new account.",
+      NotAuthorizedException:
+        "Incorrect email or password. Please check your credentials and try again.",
+      UserNotConfirmedException:
+        "Please verify your email address before signing in. Check your inbox for a verification code.",
+      CodeMismatchException:
+        "The verification code you entered is incorrect. Please check the code and try again.",
       ExpiredCodeException:
-        "Verification code has expired. Please request a new one.",
-      LimitExceededException: "Too many attempts. Please try again later.",
-      UsernameExistsException: "An account with this email already exists.",
-      InvalidPasswordException: "Password does not meet requirements.",
+        "Your verification code has expired. Please request a new code to continue.",
+      LimitExceededException:
+        "Too many sign-in attempts. Please wait a few minutes before trying again.",
+      UsernameExistsException:
+        "An account with this email address already exists. Please sign in instead.",
+      InvalidPasswordException:
+        "Password doesn't meet the requirements. Please use at least 8 characters with a mix of letters and numbers.",
       TooManyRequestsException:
-        "Too many requests. Please wait before trying again.",
+        "Too many requests sent. Please wait a moment before trying again.",
       NetworkError:
-        "Network error. Please check your connection and try again.",
+        "Network connection issue. Please check your internet connection and try again.",
+      TooManyFailedAttemptsException:
+        "Account temporarily locked due to too many failed attempts. Please try again later.",
+      InvalidParameterException:
+        "Invalid information provided. Please check your input and try again.",
+      ResourceNotFoundException:
+        "Service temporarily unavailable. Please try again in a few moments.",
     };
 
     const message =
       errorMessages[errorCode] ||
       error.message ||
-      "An unexpected error occurred. Please try again.";
+      "Something unexpected happened. Please try again or contact support if the problem continues.";
     return new Error(message);
   },
 };

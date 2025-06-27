@@ -1,7 +1,7 @@
 import { useAuth } from "@/providers/AuthProvider";
 import type { AuthStackParamList } from "@/types/auth";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -18,7 +18,7 @@ import {
   YStack,
 } from "tamagui";
 
-type Props = NativeStackScreenProps<AuthStackParamList, "ConfirmSignUp">;
+type Props = NativeStackScreenProps<AuthStackParamList, "EmailVerification">;
 
 interface FormState {
   isSubmitting: boolean;
@@ -31,23 +31,68 @@ interface FormState {
   successMessage?: string;
 }
 
-export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { email, password } = route.params;
+export const EmailVerificationScreen: React.FC<Props> = ({
+  navigation,
+  route,
+}) => {
+  const { email, password, context, autoSent } = route.params;
   const { confirmSignUp, resendConfirmationCode, signIn } = useAuth();
   const insets = useSafeAreaInsets();
   const [code, setCode] = useState("");
+
+  // Context-aware messaging
+  const isSignupFlow = context === "signup";
+  const title = isSignupFlow
+    ? "Verify Your Email"
+    : "Email Verification Required";
+  const subtitle = isSignupFlow
+    ? "We sent a verification code to complete your account setup"
+    : "Please verify your email address to continue signing in";
+  const autoSentMessage = autoSent
+    ? `We just sent a verification code to ${email}`
+    : undefined;
+  const buttonText = isSignupFlow
+    ? "Verify & Complete Setup"
+    : "Verify & Sign In";
+  const backText = isSignupFlow ? "← Back to Sign Up" : "← Back to Sign In";
+  const backAction = () =>
+    navigation.navigate(isSignupFlow ? "SignUp" : "Login");
+
   const [formState, setFormState] = useState<FormState>({
     isSubmitting: false,
     isResending: false,
     isSuccess: false,
     errors: {},
+    successMessage: autoSentMessage,
   });
 
-  const handleConfirmSignUp = async () => {
+  // Clear the auto-sent message after a few seconds
+  useEffect(() => {
+    if (autoSent && formState.successMessage) {
+      const timer = setTimeout(() => {
+        setFormState((prev) => ({
+          ...prev,
+          successMessage: undefined,
+        }));
+      }, 4000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [autoSent, formState.successMessage]);
+
+  const handleVerifyCode = async () => {
     if (!code.trim()) {
       setFormState((prev) => ({
         ...prev,
-        errors: { code: "Please enter the verification code" },
+        errors: { code: "Please enter the 6-digit verification code" },
+      }));
+      return;
+    }
+
+    if (code.length !== 6) {
+      setFormState((prev) => ({
+        ...prev,
+        errors: { code: "Verification code must be 6 digits" },
       }));
       return;
     }
@@ -60,7 +105,7 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
     });
 
     try {
-      // Step 1: Confirm sign up
+      // Step 1: Confirm the user's email
       await confirmSignUp(email, code.trim());
 
       setFormState((prev) => ({
@@ -77,21 +122,22 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
           isResending: false,
           isSuccess: true,
           errors: {},
-          successMessage: "Welcome! You have been signed in successfully",
+          successMessage: isSignupFlow
+            ? "Welcome! Your account is ready"
+            : "Welcome back! You're now signed in",
         });
 
         // Navigation will be handled automatically by RootNavigator based on auth state
       } catch (signInError) {
-        console.error("Auto sign-in failed:", signInError);
+        console.error("Auto sign-in failed after verification:", signInError);
 
-        // If auto sign-in fails, show error and navigate to login
+        // If auto sign-in fails, show success but redirect to login
         setFormState({
           isSubmitting: false,
           isResending: false,
           isSuccess: false,
           errors: {
-            general:
-              "Email verified but auto sign-in failed. Please sign in manually.",
+            general: "Email verified successfully! Please sign in to continue.",
           },
         });
 
@@ -101,7 +147,7 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
         }, 2000);
       }
     } catch (error) {
-      console.error("Email confirmation failed:", error);
+      console.error("Email verification failed:", error);
       setFormState({
         isSubmitting: false,
         isResending: false,
@@ -110,7 +156,7 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
           general:
             error instanceof Error
               ? error.message
-              : "Verification failed. Please try again.",
+              : "Verification failed. Please check your code and try again.",
         },
       });
     }
@@ -137,7 +183,7 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
           ...prev,
           successMessage: undefined,
         }));
-      }, 3000);
+      }, 4000);
     } catch (error) {
       setFormState((prev) => ({
         ...prev,
@@ -185,13 +231,15 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
         <YStack space="$6" width="100%" maxWidth={400} alignSelf="center">
           {/* Header */}
           <YStack alignItems="center" space="$3">
-            <H2 textAlign="center">Verify Your Email</H2>
-            <Paragraph color="$color10" textAlign="center">
-              We've sent a verification code to:
-            </Paragraph>
-            <Text fontWeight="600" fontSize="$4" color="$blue11">
-              {email}
-            </Text>
+            <H2 textAlign="center">{title}</H2>
+            <YStack alignItems="center" space="$2">
+              <Paragraph color="$color10" textAlign="center">
+                {subtitle}
+              </Paragraph>
+              <Text fontWeight="600" fontSize="$4" color="$blue11">
+                {email}
+              </Text>
+            </YStack>
           </YStack>
 
           {/* Success Message */}
@@ -204,8 +252,7 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
               padding="$4"
             >
               <Text color="$green11" textAlign="center" fontWeight="600">
-                ✅{" "}
-                {formState.successMessage || "Welcome! Successfully signed in"}
+                ✅ {formState.successMessage || "Successfully verified!"}
               </Text>
             </Card>
           )}
@@ -234,13 +281,12 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
             padding="$4"
           >
             <Paragraph fontSize="$3" color="$blue11" textAlign="center">
-              Please check your email and enter the 6-digit verification code
-              below.
+              Check your email and enter the 6-digit verification code below
             </Paragraph>
           </Card>
 
           {/* Form */}
-          <Form onSubmit={handleConfirmSignUp}>
+          <Form onSubmit={handleVerifyCode}>
             <YStack space="$4">
               <YStack space="$2">
                 <Label fontWeight="600">Verification Code *</Label>
@@ -248,7 +294,11 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
                   placeholder="Enter 6-digit code"
                   value={code}
                   onChangeText={(value: string) => {
-                    setCode(value);
+                    // Only allow numbers and limit to 6 digits
+                    const numericValue = value
+                      .replace(/[^0-9]/g, "")
+                      .slice(0, 6);
+                    setCode(numericValue);
                     clearCodeError();
                   }}
                   keyboardType="number-pad"
@@ -269,30 +319,29 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
               </YStack>
 
               {/* Verify Button */}
-              <Form.Trigger asChild>
-                <Button
-                  size="$5"
-                  theme="blue"
-                  disabled={
-                    formState.isSubmitting ||
-                    code.length !== 6 ||
-                    formState.isSuccess
-                  }
-                  opacity={
-                    formState.isSubmitting ||
-                    code.length !== 6 ||
-                    formState.isSuccess
-                      ? 0.6
-                      : 1
-                  }
-                >
-                  {formState.isSubmitting
-                    ? "Verifying..."
-                    : formState.isSuccess
-                    ? "Verified!"
-                    : "Verify Email"}
-                </Button>
-              </Form.Trigger>
+              <Button
+                size="$5"
+                theme="blue"
+                disabled={
+                  formState.isSubmitting ||
+                  code.length !== 6 ||
+                  formState.isSuccess
+                }
+                opacity={
+                  formState.isSubmitting ||
+                  code.length !== 6 ||
+                  formState.isSuccess
+                    ? 0.6
+                    : 1
+                }
+                onPress={handleVerifyCode}
+              >
+                {formState.isSubmitting
+                  ? "Verifying..."
+                  : formState.isSuccess
+                  ? "Verified!"
+                  : buttonText}
+              </Button>
             </YStack>
           </Form>
 
@@ -323,16 +372,16 @@ export const ConfirmSignUpScreen: React.FC<Props> = ({ navigation, route }) => {
             </Button>
           </YStack>
 
-          {/* Back to Sign Up */}
+          {/* Back Button */}
           <XStack justifyContent="center">
             <Button
               size="$3"
               variant="outlined"
-              onPress={() => navigation.navigate("SignUp")}
+              onPress={backAction}
               chromeless
               disabled={formState.isSubmitting || formState.isSuccess}
             >
-              ← Back to Sign Up
+              {backText}
             </Button>
           </XStack>
         </YStack>
